@@ -6,6 +6,13 @@ export type FullButtonType = {
   onClick: () => void
 }
 
+export type AuthBackgroundType = {
+  text1: String
+  text2: String
+  onClick1: () => void
+  onClick2: () => void
+}
+
 export type LargeButtonType = {
   text: string
   onClick: () => void

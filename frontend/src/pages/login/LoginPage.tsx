@@ -1,27 +1,15 @@
-// import NaverLogin from '@components/login/NaverLogin'
-// import KakaoLogin from '@components/login/KakaoLogin'
-// import * as l from '@pages/login/LoginPage.styled'
-// import LoginSection from '@components/login/LoginSection'
-// import { useRecoilValue } from 'recoil'
-// import { themeState } from '@/stores/theme'
+import LoginFooter from '@/components/login/LoginFooter'
+import LoginHeader from '@/components/login/LoginHeader'
+import LoginSection from '@/components/login/LoginSection'
+import * as l from '@pages/login/LoginPage.styeld'
 
 const LoginPage = () => {
-//   const theme = useRecoilValue(themeState)
-
   return (
-    <p>로그인페이지</p>
-    // <l.Theme $theme={theme}>
-    //   <l.Container>
-    //     <LoginSection />
-    //     <l.SubDesc>
-    //       <l.Dash />
-    //       SNS 계정으로 간편 가입하기
-    //       <l.Dash />
-    //     </l.SubDesc>
-    //     <KakaoLogin />
-    //     <NaverLogin />
-    //   </l.Container>
-    // </l.Theme>
+    <l.Container>
+      <LoginHeader />
+      <LoginSection />
+      <LoginFooter />
+    </l.Container>
   )
 }
 
