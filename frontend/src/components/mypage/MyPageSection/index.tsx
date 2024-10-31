@@ -1,5 +1,5 @@
 import { BASE_URL } from '@utils/requestMethods'
-import * as s from '@components/signup/SignupSection/SignupSection.styled'
+import * as m from '@components/mypage/MyPageSection/MyPageSection.styled'
 import { useNavigate } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 import AuthBackground from '@common/AuthBackground/index'
@@ -12,11 +12,11 @@ const index = () => {
   }
   
   return (
-    <s.Container>
-      <s.image>
-        <s.SmallImageUpLeft/>
-        <s.SmallImageUpRight/>
-      </s.image>
+    <m.Container>
+      <m.image>
+        <m.SmallImageUpLeft/>
+        <m.SmallImageUpRight/>
+      </m.image>
       <AuthBackground
         title='회원가입'
         text1='뒤로가기'
@@ -31,7 +31,7 @@ const index = () => {
         ]}
         >
       </AuthBackground>
-    </s.Container>
+    </m.Container>
   )
 }
 

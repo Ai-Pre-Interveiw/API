@@ -28,6 +28,49 @@ export const ButtonWrap = styled.div`
   justify-content: space-between;
 `
 
+export const LoginButtonWrap = styled.div`
+  display:flex;
+  width: 45vh;
+  justify-content: space-between;
+
+  p {
+    font-size: 1.5vh;
+    margin: 4% 0; /* p 태그 위아래 간격 설정 */
+  }
+`
+
+export const MentImageWrap = styled.div`
+  display:flex;
+  flex-direction: row;
+  width: 15.8vh;
+
+  button {
+    margin-left: 5%;
+  }
+`
+
+export const UserInfoWrap = styled.div`
+  display:flex;
+  flex-direction: column;
+  align-items: end;
+  justify-content: center;
+`
+
+export const ProfileButton = styled.button`
+  width: 5vh;
+  height: auto;
+  transition: transform 0.3s ease; /* 부드러운 크기 전환 효과 */
+
+  &:hover {
+    transform: scale(1.1); /* 마우스 올렸을 때 약간 확대 */
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+  }
+`;
+
 export const image = styled.button`
   display:flex;
 `

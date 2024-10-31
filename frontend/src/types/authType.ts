@@ -7,6 +7,7 @@ export type userType = {
   nickname: string
   createdAt: string
   imageUrl: string
+  resume: string[]
 }
 
 export type SignupInputSectionType = {

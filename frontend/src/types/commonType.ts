@@ -15,6 +15,12 @@ export type AuthBackgroundType = {
   inputs: { inputTitle: string; inputText: string; isEssentail: boolean; }[]
 }
 
+export type MainBackgroundType = {
+  image_url: string[]
+  text1: string[]
+  text2: string[]
+}
+
 export type LargeButtonType = {
   text: string
   onClick: () => void
@@ -43,8 +49,10 @@ export type FileStateType = {
 }
 
 export type ModalType = {
+  width: string
+  height: string
   name: string
-  children: React.ReactNode
+  texts: string[]
   onClose: () => void
 }
 
