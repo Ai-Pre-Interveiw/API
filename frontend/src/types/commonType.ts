@@ -7,10 +7,12 @@ export type FullButtonType = {
 }
 
 export type AuthBackgroundType = {
+  title: String
   text1: String
   text2: String
   onClick1: () => void
   onClick2: () => void
+  inputs: { inputTitle: string; inputText: string; isEssentail: boolean; }[]
 }
 
 export type LargeButtonType = {

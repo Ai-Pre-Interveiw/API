@@ -24,6 +24,8 @@ export const Wrap = styled.div`
 
 export const ButtonWrap = styled.div`
   display:flex;
+  width: 25vh;
+  justify-content: space-between;
 `
 
 export const image = styled.button`
