@@ -11,5 +11,4 @@ export const Button = styled.button`
   height: 5vh;
   border-radius: 30px;
   font-size: 1.8vh;
-  margin-right: 5%;
 `
