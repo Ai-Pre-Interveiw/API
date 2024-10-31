@@ -1,4 +1,3 @@
-import { colors } from '@/styles/theme'
 import styled from 'styled-components'
 
 export const Container = styled.div`
@@ -8,8 +7,9 @@ export const Container = styled.div`
   height: 100%;
 `
 
-export const Wrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+export const BackgroundImg = styled.img`
+  position: absolute;
+  width: 45%;
+  right: 0;
+  z-index: -1;
 `

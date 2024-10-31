@@ -36,6 +36,7 @@ const Index = (props: AuthBackgroundType) => {
         nickname: inputValues.nickname,
         createdAt: new Date().toISOString(),
         imageUrl: '/src/assets/images/profile.png',
+        resume: []
       };
       if (inputValues.email === '' || inputValues.password1 === '' || inputValues.password2 === '') {
         alert('* 표시는 필수 입력사항 입니다.')
@@ -45,6 +46,8 @@ const Index = (props: AuthBackgroundType) => {
         alert('비밀번호는 8자 이상 15자 미만으로 설정해주세요.');
       } else if (inputValues.password1 !== inputValues.password2) {
         alert('비밀번호가 일치하지 않습니다.');
+      } else if (inputValues.nickname.length > 6) {
+        alert('닉네임은 6자 이하로 작성해주세요.')
       } else {
         setUserState(newUser)
         navigate('/')
@@ -56,6 +59,7 @@ const Index = (props: AuthBackgroundType) => {
         nickname: 'test',
         createdAt: new Date().toISOString(),
         imageUrl: '/src/assets/images/profile.png',
+        resume: []
       };
       if (!emailPattern.test(inputValues.email)) {
         alert('아이디는 email 형식을 따라야 합니다.')
@@ -127,7 +131,13 @@ const Index = (props: AuthBackgroundType) => {
         </a.signupContainer>
       )}
       <a.WrapButton>
-        <FullButton text={String(text1)} onClick={onClick1} disabled />
+        {title === '로그인' ?
+          <a.HintButtonWrapper>
+            <a.HintText>아직 회원이 아니신가요?</a.HintText>
+            <FullButton text={String(text1)} onClick={onClick1} disabled />
+          </a.HintButtonWrapper>
+          : <FullButton text={String(text1)} onClick={onClick1} disabled />
+        }
         <FullButton text={String(text2)} onClick={onClick} disabled />
       </a.WrapButton>
     </a.Container>
