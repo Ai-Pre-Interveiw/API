@@ -4,7 +4,7 @@ import Navbar from '@common/Navbar/index'
 const index = () => {
   return (
     <l.Container>
-      <Navbar current="home" />
+      <Navbar current="login" />
     </l.Container>
   )
 }

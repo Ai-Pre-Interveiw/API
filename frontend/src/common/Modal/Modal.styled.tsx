@@ -9,7 +9,7 @@ export const BlackBox = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: #000;
-  opacity: 0.3;
+  opacity: 0.5;
 `
 
 export const Container = styled.div`
@@ -29,8 +29,8 @@ export const Wrap = styled.div<{ width?: string; height?: string }>`
   display: flex;
   align-items: center;
   flex-direction: column;
-  background-color: #fff;
-  border-radius: 40px;
+  background-color: ${({ width }) => (width === '100%' ? 'transparent' : '#fff')};
+  border-radius: ${({ width }) => (width === '100%' ? '0px' : '40px;')};
   padding-top: 7vh;
   width: ${({ width }) => width || '40%'}; /* props로 전달된 width 사용 */
   height: ${({ height }) => height || '50%'}; /* props로 전달된 height 사용 */
@@ -53,6 +53,7 @@ export const Backdrop = styled.button`
 
 export const TextWrapper = styled.div`
   display: flex;
+  flex-direction: column;
   text-align: center;
   justify-content: center;
 `;
@@ -74,6 +75,44 @@ export const SubText = styled.p`
 export const TitleText = styled.p`
   font-size: 2.5vh;
   font-weight: bold;
+`
+
+export const InterviewText = styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 5vh;
+  font-weight: bold;
+  color: #FFFFFF;
+`
+
+export const InterviewTextWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10vh;
+  margin-top: 10vh;
+`
+
+export const InterviewTextSubWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+`
+
+export const InterviewButtonWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10vh;
+  
+  /* FullButton 크기 조정 */
+  button {
+    width: 10vw; /* 버튼 너비 */
+    height: 6vh; /* 버튼 높이 */
+    font-size: 3vh; /* 버튼 글씨 크기 */
+  }
 `
 
 export const ButtonWrap = styled.div`

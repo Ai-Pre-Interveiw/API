@@ -8,6 +8,7 @@ import SignupPage from '@/pages/signup/SignupPage'
 import MyPage from '@pages/mypage/MyPage'
 import AnalysisPage from '@/pages/analysis/AnalysisPage'
 import InterviewPage from '@/pages/interview/InterviewPage'
+import InterviewingPage from '@/pages/interview/InterviewingPage'
 // import FundingDetailPage from '@/pages/funding/FundingDetailPage'
 // import DetailMainPage from '@/pages/funding/DetailMainPage'
 // import DonorListPage from '@/pages/funding/DonorListPage'
@@ -32,6 +33,7 @@ const AuthRouter = () => {
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/analysis" element={<AnalysisPage />} />
       <Route path="/interview" element={<InterviewPage />} />
+      <Route path="/interviewing" element={<InterviewingPage />} />
       {/* <Route path="/search" element={<SearchPage />} /> */}
       {/* <Route path="/funding" element={<FundingPage />} /> */}
       {/* <Route path="/alarm" element={<AlarmPage />} /> */}

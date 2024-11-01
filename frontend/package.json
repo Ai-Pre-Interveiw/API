@@ -23,10 +23,12 @@
     "react-dom": "^18.2.0",
     "react-helmet-async": "^2.0.5",
     "react-router-dom": "^6.22.3",
+    "react-webcam": "^7.2.0",
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
     "styled-components": "^6.1.13",
-    "styled-reset": "^4.5.2"
+    "styled-reset": "^4.5.2",
+    "webcam": "^3.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",

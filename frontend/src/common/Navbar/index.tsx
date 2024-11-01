@@ -23,15 +23,29 @@ const Index = (props: { current: string }) => {
   };
 
   const goMyPage = () => {
-    navigate('/mypage');
+    if (current === 'interview') {
+      alert('홈페이지로 이동 후 이용해주세요.')
+      navigate('/')
+    } else {
+      navigate('/mypage');
+    }
   };
 
   const goAnalysisPage = () => {
-    navigate('/analysis');
+    if (current === 'interview') {
+      alert('홈페이지로 이동 후 이용해주세요.')
+      navigate('/')
+    } else {
+      navigate('/analysis');
+    }
   };
 
   const handleFirstModalOpen = () => {
-    setIsFirstModalOpen(true); // 첫 번째 모달 열기
+    if (current === 'interview') {
+      alert('모의면접이 진행중입니다.')
+    } else {
+      setIsFirstModalOpen(true); // 첫 번째 모달 열기
+    }
   };
 
   const handleFirstModalClose = () => {
