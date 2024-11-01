@@ -58,18 +58,23 @@ export const TextWrapper = styled.div`
 `;
 
 export const BoldText = styled.p`
-  font-size: 1.5rem; /* 두꺼운 텍스트 크기 */
+  font-size: 3.5vh; /* 두꺼운 텍스트 크기 */
   font-weight: bold;
   line-height: 1.2;
   margin-bottom: 1vh;
 `;
 
 export const SubText = styled.p`
-  font-size: 1rem; /* 작은 텍스트 크기 */
+  font-size: 2.5vh; /* 작은 텍스트 크기 */
   font-weight: 300;
   color: #666; /* 옅은 색상 */
   margin-top: 3vh;
 `;
+
+export const TitleText = styled.p`
+  font-size: 2.5vh;
+  font-weight: bold;
+`
 
 export const ButtonWrap = styled.div`
   display:flex;
@@ -77,6 +82,41 @@ export const ButtonWrap = styled.div`
   justify-content: space-between;
   margin-top: 5vh;
 `
+
+export const FileInputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+
+  .custom-file-upload {
+    display: inline-block;
+    padding: 8px 12px;
+    width: 23vw; /* 고정된 너비 */
+    height: 5vh; /* 고정된 높이 */
+    cursor: pointer;
+    background-color: #fff;
+    color: #888;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 2vh;
+    text-align: left; /* 텍스트 중앙 정렬 */
+    overflow: hidden; /* 텍스트가 넘칠 경우 숨김 */
+    white-space: nowrap; /* 텍스트가 한 줄로 유지되도록 설정 */
+    text-overflow: ellipsis; /* 텍스트가 길 경우 ... 표시 */
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #f7f7f7;
+      border-color: #888;
+    }
+  }
+`;
+
+export const FileName = styled.span`
+  margin-left: 10px;
+  font-size: 2vh;
+  color: #555;
+`;
 
 // export const ModalName = styled.div`
 //   display: flex;

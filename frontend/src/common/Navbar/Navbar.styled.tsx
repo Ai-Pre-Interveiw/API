@@ -73,6 +73,11 @@ export const ProfileButton = styled.button`
 
 export const image = styled.button`
   display:flex;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+  transform: scale(1.1); /* 마우스 올렸을 때 약간 확대 */
+  }
 `
 
 export const Item = styled(Link)`

@@ -1,36 +1,35 @@
 import { BASE_URL } from '@utils/requestMethods'
+import { useState } from 'react';
 import * as m from '@components/mypage/MyPageSection/MyPageSection.styled'
 import { useNavigate } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
-import AuthBackground from '@common/AuthBackground/index'
+import MyPageResume from '@components/mypage/MyPageResume'
+import MyPageUser from '@components/mypage/MyPageUser'
 
 const index = () => {
   const navigate = useNavigate()
 
-  const goBack =() => {
-    navigate('/')
-  }
+  const [selectedMenu, setSelectedMenu] = useState('회원정보'); // 초기값을 '자기소개서'로 설정
+
+  const handleMenuClick = (menu: string) => {
+    setSelectedMenu(menu); // 선택된 메뉴 업데이트
+  };
   
   return (
     <m.Container>
-      <m.image>
-        <m.SmallImageUpLeft/>
-        <m.SmallImageUpRight/>
-      </m.image>
-      <AuthBackground
-        title='회원가입'
-        text1='뒤로가기'
-        text2='회원가입'
-        onClick1={goBack}
-        onClick2={() => {}}
-        inputs={[
-          { inputTitle: 'email', inputText: '아이디를 입력해주세요. (email 형식)', isEssentail: false },
-          { inputTitle: 'password1', inputText: '비밀번호를 입력해주세요. (8자이상 15자 미만)', isEssentail: false },
-          { inputTitle: 'password2', inputText: '비밀번호를 한번 더 입력해주세요.', isEssentail: false },
-          { inputTitle: 'nickname', inputText: '닉네임을 입력해주세요. (6자 이내)', isEssentail: false },
-        ]}
-        >
-      </AuthBackground>
+      <m.WrapMenu>
+        <m.Menu onClick={() => handleMenuClick('자기소개서')} selected={selectedMenu === '자기소개서'}>
+          자기소개서
+        </m.Menu>
+        <m.Menu onClick={() => handleMenuClick('회원정보')} selected={selectedMenu === '회원정보'}>
+          회원정보
+        </m.Menu>
+      </m.WrapMenu>
+      {selectedMenu === '자기소개서' ? 
+        <MyPageResume/>
+      :
+        <MyPageUser/>
+      }
     </m.Container>
   )
 }

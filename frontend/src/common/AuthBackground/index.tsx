@@ -124,10 +124,10 @@ const Index = (props: AuthBackgroundType) => {
               />
             </a.InputWrapper>
           ))}
-          <p>
+          <a.GuideText>
             <span style={{ color: 'red' }}>* </span>
             표시는 필수 입력사항 입니다.
-          </p>
+          </a.GuideText>
         </a.signupContainer>
       )}
       <a.WrapButton>
