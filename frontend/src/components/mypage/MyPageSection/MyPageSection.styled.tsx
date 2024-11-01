@@ -3,14 +3,49 @@ import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
-  flex-direction: row;
-  padding-left: 15%;
-  padding-right: 10%;
+  flex-direction: column;
   width: 100%;
-  height: 80vh;
-  justify-content: space-between;
-  align-items: center;
-  row-gap: 5%;
+  height: 85vh;
+  padding-left: 1%;
+  padding-right: 1%;
+  // justify-content: space-between;
+  // align-items: center;
+  // row-gap: 5%;
+`
+
+export const Menu = styled.button<{ selected: boolean }>`
+  font-size: 3.5vh;
+  padding: 1%;
+  border: none;
+  background: none;
+  // color: ${({ selected }) => (selected ? colors.purple : 'inherit')}; /* 선택된 경우 글씨 색상을 보라색으로 */
+  font-weight: ${({ selected }) => (selected ? 'bold' : 'normal')}; /* 선택된 경우 글씨를 bold로 */
+  position: relative;
+  transition: all 0.1s ease; /* 부드러운 전환 효과 */
+
+
+  &:hover { /* hover 시 글씨를 bold로 */
+    font-weight: bold;
+  }
+
+  /* selected 상태에서만 안쪽 보더를 표시하는 ::after 가상 요소 */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; /* 버튼 아래쪽에 위치 */
+    left: 1%; /* 좌우 간격을 약간 좁혀서 내부에 보더를 주는 효과 */
+    right: 2%;
+    height: 0.7vh; /* 보더의 높이 */
+    background-color: ${({ selected }) => (selected ? colors.purple : 'transparent')}; /* 선택된 경우 보라색으로 */
+    border-radius: 5px 5px 0 0; /* 테두리를 둥글게 */
+  }
+`;
+
+export const WrapMenu = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: 2%;
+  border-bottom: 1px solid #ccc;
 `
 
 export const WrapButton = styled.div`

@@ -10,7 +10,7 @@ export const Button = styled.button`
   color: #fff; /* 기본 글씨 색 */
   height: 5vh;
   border-radius: 30px;
-  font-size: 1.8vh;
+  font-size: 2vh;
   border: none; /* 기본 상태에서는 테두리 없음 */
   transition: background-color 0.3s, color 0.3s, font-weight 0.3s, border 0.3s; /* 전환 효과 추가 */
 

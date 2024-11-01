@@ -50,7 +50,7 @@ const Index = (props: { current: string }) => {
     <n.Container>
       <n.Wrap>
         <n.image onClick={goHome}>
-          <img src="src/assets/images/api_logo_web.png" alt="..." style={{ width: '13vh', height: 'auto' }} />
+          <img src="src/assets/images/api_logo_web.png" alt="..." style={{ width: 'auto', height: '5.6vh' }} />
         </n.image>
         {user.memberNo === -1 ? (
           <n.ButtonWrap>
@@ -59,7 +59,7 @@ const Index = (props: { current: string }) => {
           </n.ButtonWrap>
         ) : (
           <n.LoginButtonWrap>
-            <FullButton text="모의 면접" onClick={handleFirstModalOpen} disabled/> {/* 첫 번째 모달 열기 */}
+            <FullButton text="모의 면접" onClick={handleFirstModalOpen} disabled/>
             <FullButton text="분석 결과" onClick={goAnalysisPage} disabled/>
             <n.MentImageWrap>
               <n.UserInfoWrap>
@@ -85,8 +85,8 @@ const Index = (props: { current: string }) => {
             '시작 하시겠습니까?',
             '시작하기 버튼을 누르면 준비페이지로 넘어갑니다.'
           ]}
-          width="40%"
-          height="35%"
+          width="30%"
+          height="38%"
         />
       )}
 
@@ -102,8 +102,8 @@ const Index = (props: { current: string }) => {
             '자기소개서를 등록해주세요.',
             '등록하기 버튼을 누르면 내정보 페이지로 이동합니다.',
           ]}
-          width="40%"
-          height="40%"
+          width="30%"
+          height="42%"
         />
       )}
     </n.Container>

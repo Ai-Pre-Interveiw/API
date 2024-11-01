@@ -15,7 +15,7 @@ export const Wrap = styled.div`
 `
 
 export const Copyright = styled.div`
-  font-size: 0.8em;
+  font-size: 1.7vh;
   color: ${colors.gray04};
 `
 
@@ -28,7 +28,7 @@ export const Menu = styled.div`
   display: flex;
   justify-content: space-between;
   width: 30%;
-  font-size: 0.8em;
+  font-size: 1.7vh;
   color: ${colors.gray04};
 `
 

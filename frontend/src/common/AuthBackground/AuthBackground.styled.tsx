@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 60vh;
+  width: 70vh;
   height: 70vh;
   justify-content: center;
   align-items: center;
@@ -14,7 +14,7 @@ export const Container = styled.div`
 `;
 
 export const Title = styled.h1`
-  font-size: 1.5rem; /* 글씨 크기 조절 */
+  font-size: 3.5vh; /* 글씨 크기 조절 */
   font-weight: bold;
   position: absolute;
   top: 5vh; /* 위에 고정시키기 위해 top 설정 */
@@ -54,7 +54,7 @@ export const InputWrapper = styled.div`
 `;
 
 export const Label = styled.label`
-  font-size: 1rem;
+  font-size: 2vh;
   margin-bottom: 5px;
   display: block;
 `;
@@ -65,12 +65,12 @@ export const InputField = styled.input`
   border: none; /* 전체 테두리 제거 */
   border-bottom: 1px solid #ddd; /* 아래쪽에만 테두리 추가 */
   box-sizing: border-box;
-  font-size: 1rem;
+  font-size: 2.1vh;
   height: 80%;
 `;
 
 export const HintText = styled.p`
-  font-size: 0.85rem; /* 작은 폰트 크기 */
+  font-size: 1.5vh; /* 작은 폰트 크기 */
   color: #888; /* 옅은 색상 */
   margin: 0;
   padding: 0;
@@ -85,6 +85,10 @@ export const HintButtonWrapper = styled.div`
   justify-content: center; /* 가로 가운데 정렬 */
   gap: 1vh; /* HintText와 버튼 사이 간격 */
 `;
+
+export const GuideText = styled.p`
+  font-size: 2vh;
+`
 
 /* ment_group */
 

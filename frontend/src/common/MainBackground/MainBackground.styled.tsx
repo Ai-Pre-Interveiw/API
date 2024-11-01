@@ -71,12 +71,12 @@ export const TextWrapper2 = styled.div`
 `
 
 export const Text1 = styled.p`
-  font-size: 1.6rem;
+  font-size: 3.2vh;
   font-weight: bold;
   color: ${colors.purple};
 `;
 
 export const Text2 = styled.p`
-  font-size: 1.2rem;
+  font-size: 2.8vh;
   font-weight: bold;
 `;
