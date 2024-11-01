@@ -4,7 +4,7 @@ import Navbar from '@common/Navbar/index'
 const index = () => {
   return (
     <m.Container>
-      <Navbar current="home" />
+      <Navbar current="mypage" />
     </m.Container>
   )
 }

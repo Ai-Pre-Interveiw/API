@@ -9,7 +9,7 @@ import MyPageUser from '@components/mypage/MyPageUser'
 const index = () => {
   const navigate = useNavigate()
 
-  const [selectedMenu, setSelectedMenu] = useState('회원정보'); // 초기값을 '자기소개서'로 설정
+  const [selectedMenu, setSelectedMenu] = useState('자기소개서'); // 초기값을 '자기소개서'로 설정
 
   const handleMenuClick = (menu: string) => {
     setSelectedMenu(menu); // 선택된 메뉴 업데이트

@@ -64,7 +64,7 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
       <m.Container>
         <m.BlackBox onClick={onClose} />
         <m.Wrap width={width} height={height}>
-            {texts.map((text, index) => (
+            {/* {texts.map((text, index) => (
               <m.TextWrapper key={index}>
                 {name === '모의면접' ? 
                   index === 0 || index === 1 ? 
@@ -75,16 +75,47 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
                     <m.BoldText>{text}</m.BoldText> : 
                     <m.SubText>{text}</m.SubText> :
                 name === '자기소개서 등록' ? 
-                index === 0 ?
-                  <m.TitleText>{text}</m.TitleText> : 
-                  <div></div> :
+                  index === 0 ?
+                    <m.TitleText>{text}</m.TitleText> : 
+                    <div></div> :
+                name === '면접 시작' ?
+                  <m.InterviewText>
+                    {text}
+                  </m.InterviewText> :
                 <div></div>
                 }
               </m.TextWrapper>
-            ))}
-          <m.Backdrop>
-            <img src="src/assets/images/x.png" alt="" onClick={onClose} style={{ width: '3vh', height: 'auto' }} />
-          </m.Backdrop>
+            ))} */}
+              {name === '모의면접' ?
+                <m.TextWrapper>
+                  <m.BoldText>{texts[0]}</m.BoldText>
+                  <m.BoldText>{texts[1]}</m.BoldText>
+                  <m.SubText>{texts[2]}</m.SubText> 
+                </m.TextWrapper> :
+              name === '등록모달' ? 
+                <m.TextWrapper>
+                  <m.BoldText>{texts[0]}</m.BoldText>
+                  <m.BoldText>{texts[1]}</m.BoldText>
+                  <m.BoldText>{texts[2]}</m.BoldText>
+                  <m.SubText>{texts[3]}</m.SubText>
+                </m.TextWrapper> :
+              name === '자기소개서 등록' ? 
+                <m.TitleText>{texts[0]}</m.TitleText> : 
+              name === '면접 시작' ?
+                <m.InterviewTextWrap>
+                  <m.InterviewTextSubWrap>
+                    <m.InterviewText> {texts[0]}</m.InterviewText>
+                    <m.InterviewText> {texts[1]}</m.InterviewText>
+                  </m.InterviewTextSubWrap>
+                  <m.InterviewText> {texts[2]}</m.InterviewText>
+                </m.InterviewTextWrap> :
+              <div></div>
+              }
+          {!name.includes('면접') && (
+            <m.Backdrop>
+              <img src="src/assets/images/x.png" alt="" onClick={onClose} style={{ width: '3vh', height: 'auto' }} />
+            </m.Backdrop>
+          )}
           {name === '자기소개서 등록' ? (
             <m.FileInputWrapper>
               <input
@@ -114,6 +145,10 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
             <FullButton text="뒤로가기" onClick={onClose} disabled/>
             <FullButton text="등록하기" onClick={handleUpload} disabled/>
           </m.ButtonWrap> :
+          name === '면접 시작' ?
+          <m.InterviewButtonWrap>
+            <FullButton text="시작하기" onClick={onClose} disabled/>
+          </m.InterviewButtonWrap> :
           <div></div>
           }
 
