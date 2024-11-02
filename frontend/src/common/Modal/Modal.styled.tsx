@@ -1,5 +1,5 @@
 import { colors } from '@styles/theme'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 export const BlackBox = styled.div`
   position: fixed;
@@ -21,6 +21,18 @@ export const Container = styled.div`
   top: 0;
   width: 100%;
   height: 100%;
+`
+
+// 애니메이션 정의
+const fadeInScale = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.9); /* 처음에 약간 작은 상태로 시작 */
+  }
+  to {
+    opacity: 1;
+    transform: scale(1); /* 원래 크기로 확대 */
+  }
 `
 
 export const Wrap = styled.div<{ width?: string; height?: string }>`
@@ -86,6 +98,7 @@ export const InterviewText = styled.div`
   font-size: 5vh;
   font-weight: bold;
   color: #FFFFFF;
+  animation: ${fadeInScale} 1.5s ease-out;
 `
 
 export const InterviewTextWrap = styled.div`
@@ -106,7 +119,10 @@ export const InterviewButtonWrap = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 10vh;
-  
+  opacity: 0;
+  animation: ${fadeInScale} 0.8s ease-out forwards;
+  animation-delay: 1s;
+
   /* FullButton 크기 조정 */
   button {
     width: 10vw; /* 버튼 너비 */
@@ -156,6 +172,58 @@ export const FileName = styled.span`
   font-size: 2vh;
   color: #555;
 `;
+
+export const ThinkTextWrap = styled.div`
+  display: flex;
+  align-items: end;
+  height: 100%;
+  margin-bottom: 1vh;
+`
+
+export const ThinkWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 83vw;
+  bottom: 0;
+`
+
+export const ThinkButtonWrap = styled.div`
+  position: absolute;
+  right: 8.5vw;
+  bottom: 2vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+  width: 12vw;
+  background-color: white;
+  height: 6vh;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 3vh;
+`
+
+export const ThinkContent = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 69.7vw;
+  // padding: 1%;
+  background-color: white;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 3vh;
+`
+
+export const FinishContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10vh;
+  margin-top: 30vh;
+  animation: ${fadeInScale} 1.2s ease-out;
+`
 
 // export const ModalName = styled.div`
 //   display: flex;
