@@ -13,7 +13,8 @@ const defaultUser = {
   nickname: '',
   createdAt: '',
   imageUrl: '/img/img_default_profile.png',
-  resume: []
+  resume: [],
+  result: [],
 }
 
 export const userState = atom<userType>({

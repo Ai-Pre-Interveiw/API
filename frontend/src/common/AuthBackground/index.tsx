@@ -36,7 +36,8 @@ const Index = (props: AuthBackgroundType) => {
         nickname: inputValues.nickname,
         createdAt: new Date().toISOString(),
         imageUrl: '/src/assets/images/profile.png',
-        resume: []
+        resume: [],
+        result: [],
       };
       if (inputValues.email === '' || inputValues.password1 === '' || inputValues.password2 === '') {
         alert('* 표시는 필수 입력사항 입니다.')
@@ -59,7 +60,8 @@ const Index = (props: AuthBackgroundType) => {
         nickname: 'test',
         createdAt: new Date().toISOString(),
         imageUrl: '/src/assets/images/profile.png',
-        resume: []
+        resume: [],
+        result: []
       };
       if (!emailPattern.test(inputValues.email)) {
         alert('아이디는 email 형식을 따라야 합니다.')

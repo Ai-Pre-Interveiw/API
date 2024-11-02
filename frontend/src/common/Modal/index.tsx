@@ -22,6 +22,7 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
   };
 
   const goMyPage = () => {
+    onClose();
     navigate('/mypage');
   }
 
@@ -90,8 +91,8 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
 
   return (
     <>
+    <m.BlackBox onClick={onClose} />
       <m.Container>
-        <m.BlackBox onClick={onClose} />
         <m.Wrap width={width} height={height}>
           {name === '모의면접' ?
             <m.TextWrapper>
@@ -144,7 +145,7 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
           }
           {!name.includes('질문') && (
             <m.Backdrop>
-              <img src="src/assets/images/x.png" alt="" onClick={onClose} style={{ width: '3vh', height: 'auto' }} />
+              <img src="/images/x.png" alt="" onClick={onClose} style={{ width: '3vh', height: 'auto' }} />
             </m.Backdrop>
           )}
           {name === '자기소개서 등록' ? (

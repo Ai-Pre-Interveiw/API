@@ -18,7 +18,7 @@ export const Menu = styled.button<{ selected: boolean }>`
   padding: 1%;
   border: none;
   background: none;
-  // color: ${({ selected }) => (selected ? colors.purple : 'inherit')}; /* 선택된 경우 글씨 색상을 보라색으로 */
+  color: ${({ selected }) => (selected ? colors.purple : 'inherit')}; /* 선택된 경우 글씨 색상을 보라색으로 */
   font-weight: ${({ selected }) => (selected ? 'bold' : 'normal')}; /* 선택된 경우 글씨를 bold로 */
   position: relative;
   transition: all 0.1s ease; /* 부드러운 전환 효과 */
@@ -46,6 +46,19 @@ export const WrapMenu = styled.div`
   flex-direction: row;
   margin-top: 2%;
   border-bottom: 1px solid #ccc;
+`
+
+export const WrapContent = styled.div`
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`
+
+export const Not = styled.p`
+  font-size: 4vh;
+  margin-bottom: 5vh;
 `
 
 export const WrapButton = styled.div`

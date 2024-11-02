@@ -8,6 +8,7 @@ export type userType = {
   createdAt: string
   imageUrl: string
   resume: { filePath: string; uploadTime: string }[];
+  result: { filePath: string; uploadTime: string }[][];
 }
 
 export type SignupInputSectionType = {
