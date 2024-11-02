@@ -64,7 +64,7 @@ const Index = (props: { current: string }) => {
     <n.Container>
       <n.Wrap>
         <n.image onClick={goHome}>
-          <img src="src/assets/images/api_logo_web.png" alt="..." style={{ width: 'auto', height: '5.6vh' }} />
+          <img src="/images/api_logo_web.png" alt="..." style={{ width: 'auto', height: '5.6vh' }} />
         </n.image>
         {user.memberNo === -1 ? (
           <n.ButtonWrap>

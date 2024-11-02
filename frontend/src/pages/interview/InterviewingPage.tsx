@@ -3,9 +3,12 @@ import Webcam from 'react-webcam'
 import Modal from '@/common/Modal/index'
 import FullButton from '@/common/Fullbutton'
 import { useNavigate } from 'react-router-dom'
+import { useSetRecoilState } from 'recoil';
+import { userState } from '@stores/user';
 
 const Interviewing = () => {
   const navigate = useNavigate()
+  const setUserState = useSetRecoilState(userState);
   const webcamRef = useRef<Webcam | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([])
@@ -148,6 +151,11 @@ const Interviewing = () => {
     setIsFirstModalOpen(false)
     if (modalFirstContent.name === '질문 진행 4') {
       handleSaveRecording()
+      setUserState((prevUser) => ({
+        ...prevUser,
+        result: [...(prevUser.result || []), [...videoList]], // videoList를 result에 추가
+      }));
+      setVideoList([]);
       navigate('/')
     }
     setTimeout(() => {
@@ -211,18 +219,79 @@ const Interviewing = () => {
     setTimer(60)
   }
 
+  const [videoList, setVideoList] = useState<{ filePath: string; uploadTime: string }[]>([]);
+
   const handleSaveRecording = () => {
-    const blob = new Blob(recordedChunks, { type: 'video/mp4' })
+    const blob = new Blob(recordedChunks, { type: 'video/webm' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.style.display = 'none'
     a.href = url
-    a.download = 'recorded_video.mp4'
+
+    const fileName = `recorded_video_${new Date().toISOString()}.webm`;
+    const filePath = `src/assets/data/videos/${fileName}`; // 원하는 경로를 지정합니다
+    a.download = fileName;
+
     document.body.appendChild(a)
     a.click()
     URL.revokeObjectURL(url)
+
+    // 업로드 시간 포맷
+    const uploadTime = new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date());
+
+    if (currentFirstQuestion !== 1) {
+      // user의 result 업데이트
+      setVideoList((prevList) => [...prevList, { filePath, uploadTime }]);
+    }
+
     setRecordedChunks([])
   }
+
+  const [isMicActive, setIsMicActive] = useState(false)
+  const [micLevel, setMicLevel] = useState(0)
+
+  useEffect(() => {
+    // 마이크 상태와 감도 확인
+    const checkMicStatus = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        const audioContext = new AudioContext()
+        const analyser = audioContext.createAnalyser()
+        const source = audioContext.createMediaStreamSource(stream)
+        source.connect(analyser)
+        analyser.fftSize = 256
+        const dataArray = new Uint8Array(analyser.frequencyBinCount)
+  
+        const checkAudioInput = () => {
+          analyser.getByteFrequencyData(dataArray)
+          const volume = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length // 평균 볼륨 계산
+          setMicLevel(volume) // 마이크 감도 상태 업데이트
+  
+          if (volume > 50 && !isMicActive) { 
+            // isMicActive가 이미 true라면 변경하지 않음
+            setIsMicActive(true)
+          }
+        }
+        const interval = setInterval(checkAudioInput, 100)
+  
+        return () => {
+          clearInterval(interval)
+          audioContext.close()
+          stream.getTracks().forEach(track => track.stop())
+        }
+      } catch (error) {
+        console.error("마이크 접근에 실패했습니다:", error)
+      }
+    }
+    checkMicStatus()
+  }, [isMicActive])
 
   return (
     <div style={{
@@ -245,6 +314,29 @@ const Interviewing = () => {
         }}
       />
 
+      {/* 마이크 감도 바 */}
+      {currentFirstQuestion == 1 ?
+        <div style={{
+          position: 'absolute',
+          bottom: '10vh',
+          right: '10vw',
+          width: '9vw',
+          height: '1vh',
+          backgroundColor: 'lightgray',
+          borderRadius: '5px',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            width: `${micLevel}%`, // 마이크 감도에 따라 너비 조정
+            height: '100%',
+            backgroundColor: micLevel > 50 ? 'green' : 'red',
+            transition: 'width 0.1s ease' // 부드러운 애니메이션 효과
+          }} />
+        </div> : 
+      <div></div>
+      }
+
+
       <div style={{
         position: 'absolute',
         right: '8.5vw',
@@ -260,7 +352,13 @@ const Interviewing = () => {
         borderRadius: '30px'
       }}>
         <FullButton text={`${timer}초 남음`} onClick={() => {}} disabled/>
-        <FullButton text='답변완료' onClick={stopRecording} disabled={timer === 0}/>
+        <FullButton text='답변완료' onClick={() => {
+         if (isMicActive) {
+          stopRecording()
+         } else {
+          alert('마이크가 연결되지 않았습니다.')
+         }
+        }} disabled={timer === 0}/>
       </div>
 
       {modalFirstContent.name.includes('진행') && !isFirstModalOpen ?

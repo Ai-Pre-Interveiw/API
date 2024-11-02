@@ -7,7 +7,7 @@ import Modal from '@/common/Modal/index';
 import { useRecoilValue } from 'recoil';
 import { userState } from '@stores/user';
 
-const index = () => {
+const Index = () => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
   const user = useRecoilValue(userState);
@@ -21,6 +21,7 @@ const index = () => {
   };
   
   return (
+    <>
     <m.Container>
       {user.resume && user.resume.length > 0 ? 
       <m.SubMenu>
@@ -35,7 +36,7 @@ const index = () => {
         </m.WrapTimeCheck>
       </m.SubMenu>
       : <div></div>}
-      {user.resume && user.resume.length > 0 ? 
+      {user.resume && user.resume.length > 0 ?
         <m.ResumeList>
           {user.resume.map((resume, index) => (
             <m.ResumeItem key={index}>
@@ -56,14 +57,14 @@ const index = () => {
         <m.Not>등록된 자기소개서 없습니다.</m.Not>
         <FullButton text="등록하기" onClick={handleModalOpen} disabled/>
       </m.WrapContent>
-      
       }
-
-      {isModalOpen && (
+    </m.Container>
+    
+    {isModalOpen && (
         <Modal
           name="자기소개서 등록"
           onClose={handleModalClose}
-          openSecondModal={handleModalOpen} // 두 번째 모달 열기 함수 전달
+          openSecondModal={() => {}} // 두 번째 모달 열기 함수 전달
           texts={[
             '자기소개서 등록',
             '※ .pdf, .docs, .hwp 파일만 가능합니다.',
@@ -72,9 +73,8 @@ const index = () => {
           height="32%"
         />
       )}
-
-    </m.Container>
+    </>
   )
 }
 
-export default index
+export default Index
