@@ -37,8 +37,8 @@ const index = () => {
             <a.AnlaysisItem>
                 <video
                   src={result[0].filePath} // 비디오 파일 URL을 생성
-                  width="150" // 원하는 크기로 설정
-                  height="80"
+                  width="200vw" // 원하는 크기로 설정
+                  height="120vh"
                   controls // 비디오 컨트롤(재생, 일시 정지 등) 표시
                 />
               <a.AnalysisItemTimeButton>

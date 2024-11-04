@@ -39,6 +39,7 @@ export const SubMenu = styled.div`
   padding-bottom: 2vh;
   font-weight: bold;
   border-bottom: 1px solid;
+  font-size: 2.2vh;
   top: 0; /* 스크롤 시 화면 상단에 고정 */
   z-index: 10; /* 다른 요소보다 앞에 오도록 */
 `
@@ -53,6 +54,7 @@ export const WrapTimeCheck = styled.div`
 
 // 전체 리스트 컨테이너 스타일
 export const ResumeList = styled.div`
+  font-size: 2.5vh;
   overflow-y: auto; /* 스크롤 가능하게 설정 */
   &::-webkit-scrollbar {
     display: none; /* 크롬, 사파리, 오페라, 엣지 */

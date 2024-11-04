@@ -17,30 +17,89 @@ export const Container = styled.div`
 
 export const Title = styled.div`
   font-weight: bold;
-  font-size: 5vh;
+  font-size: 4vh;
   margin-top: 5vh;
   margin-left: 3vh;
 `
 
-export const Summary = styled.div`
+export const SecondTitle = styled.div`
+  font-weight: bold;
+  font-size: 3.3vh;
+  margin-top: 2vh;
+  margin-left: 3vh;
+`
+
+export const ThirdTitle = styled.div`
+  font-weight: bold;
+  font-size: 3vh;
+  margin-top: 2vh;
+  margin-left: 3vh;
+`
+
+export const AllWrap = styled.div`
   display: flex;
-  flex-direction: rows;
+  flex-direction: column;
   align-items: center;
-  padding: 3vh;
-  margin: 3vh;
+  justify-content: space-between;
+  margin-top: 2vh;
   background-color: ${lighten(0.35, colors.purple)};
   border-radius: 20px;
+  padding: 1%;
 `
 
-export const SummaryNum = styled.div`
-  font-size: 4vh;
+export const MenuWrap = styled.div`
+  width: 100%;
+  height: 7vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  border-radius: 10px;
+`
+
+// MenuItem: 메뉴 버튼 스타일
+export const MenuItem = styled.button<{ isSelected: boolean }>`
   font-weight: bold;
-  color: ${colors.purple}
-`
-
-export const SummaryText = styled.div`
   font-size: 3vh;
-  font-weight: bold;
+  width: 100%;
+  height: 100%;
+  background-color: ${({ isSelected }) => (isSelected ? colors.purple : 'white')};
+  color: ${({ isSelected }) => (isSelected ? 'white' : 'black')};
+  transition: all 0.3s ease; /* 부드러운 전환 효과 */
+
+  &:hover {
+    background-color: ${colors.purple};
+    color: white;
+  }
+
+  &:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+
+  /* 마지막 아이템에 하단 좌우 border-radius 적용 */
+  &:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+`
+
+// DetailWrap: 선택된 메뉴에 따른 상세 정보 표시 래퍼
+export const DetailWrap = styled.div`
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
+
+  p {
+    font-size: 1rem;
+    color: #555;
+    margin: 5px 0;
+  }
 `
 
 export const Menu = styled.div`
