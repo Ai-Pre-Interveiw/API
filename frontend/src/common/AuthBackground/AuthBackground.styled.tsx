@@ -37,7 +37,8 @@ export const loginContainer = styled.div`
   align-items: center;
   width: 70%;
   height: 30%;
-`
+  gap: 5vh;
+  `
 
 export const signupContainer = styled.div`
   display: flex;
@@ -46,6 +47,7 @@ export const signupContainer = styled.div`
   align-items: center;
   width: 70%;
   height: 60%;
+  gap: 2vh;
 `
 
 export const InputWrapper = styled.div`
@@ -57,6 +59,13 @@ export const Label = styled.label`
   font-size: 2vh;
   margin-bottom: 5px;
   display: block;
+`;
+
+export const Form = styled.form`
+  width: 100%; /* 폼의 너비를 100%로 설정 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export const InputField = styled.input`

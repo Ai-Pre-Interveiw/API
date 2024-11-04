@@ -4,6 +4,7 @@ export type FullButtonType = {
   text: string
   disabled: boolean
   onClick: () => void
+  type?: 'button' | 'submit' | 'reset'; // type 속성 추가, 선택 사항으로 설정
 }
 
 export type AuthBackgroundType = {

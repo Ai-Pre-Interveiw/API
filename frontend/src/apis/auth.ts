@@ -1,58 +1,99 @@
-import { JoinUserType, SendFCMTokenType } from '@/types/reqType'
-import { authRequest, publicRequest } from '@utils/requestMethods'
+// src/apis/authApi.ts
+import axios from 'axios';
 
-const url = '/api/v1/auth'
+const BASE_URL = 'http://localhost:8000'; // Django 서버의 기본 URL
 
-// 5분에 한 번 저장
-const JWT_EXPIRY_TIME = 3600 * 1000
-
-// refresh token 요청
-export const refresh = async () => {
-  return authRequest
-    .post(`${url}/refresh`)
-    .then(res => loginSuccess(res.data))
-    .catch(err => console.log(err))
+// 회원가입 요청에 사용할 타입 정의
+interface SignUpData {
+  email: string;
+  password1: string;
+  password2: string;
+  nickname: string;
 }
 
-// 로그인 성공 시
-export const loginSuccess = async (res: { accessToken: string }) => {
-  const { accessToken } = res
-
-  authRequest.defaults.headers.Authorization = `Bearer ${accessToken}`
-  setTimeout(() => refresh(), JWT_EXPIRY_TIME - 5000)
+// 로그인 요청에 사용할 타입 정의
+interface LoginData {
+  email: string;
+  password: string;
 }
 
-// 회원가입
-export const joinUser = async (req: JoinUserType) => {
-  const storage = localStorage.getItem('register')
-  const email = storage && JSON.parse(storage).email
-  const provider = storage && JSON.parse(storage).provider
-
-  return publicRequest
-    .put(`${url}/join`, {
-      ...req,
-      email: email || '',
-      provider: provider || '',
-    })
-    .then(res => res)
+// 서버로부터 반환될 응답 타입 정의
+interface Response {
+  message: string;
 }
 
-// 회원 정보 조회
-export const fetchUserInfo = async () => {
-  return authRequest.get(`${url}/info`).then(res => res)
+// 유저 정보 응답 타입 정의
+interface UserInfoResponse {
+  id: number;
+  email: string;
+  nickname: string;
+  profileImage: string;
+  createdAt: string;
 }
 
-// FCM 기기 토큰 전송
-export const sendFCMToken = async (req: SendFCMTokenType) => {
-  return authRequest
-    .post(`${url}/device`, req)
-    .then(res => console.log(res.data.code, 'fcm token 전송'))
-    .catch(err => console.log(err))
+// CSRF 토큰을 가져오는 함수
+async function getCsrfToken() {
+  const response = await axios.get(`${BASE_URL}/accounts/csrf-token/`, {
+    withCredentials: true,  // 세션 쿠키를 포함하여 요청
+  });
+  return response.data.csrfToken;
 }
 
-// 닉네임 중복검사
-export const checkNickname = async (ninkname: string) =>
-  publicRequest
-    .get(`${url}/nickname?nickname=${ninkname}`)
-    .then(res => res.data.data)
-    .catch(err => err)
+// 회원가입 API 요청 함수
+export const signUp = async (data: SignUpData): Promise<Response> => {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await axios.post(`${BASE_URL}/accounts/signup/`, data, {
+      headers: {
+        'X-CSRFToken': csrfToken,  // CSRF 토큰을 헤더에 포함
+      },
+      withCredentials: true,
+    });
+    console.log(response.data);
+    return response.data; // 요청 성공 시 데이터 반환
+  } catch (error: any) {
+    if (error.response) {
+      console.log("서버 응답 에러 메시지:", error.response.data);
+      throw new Error(error.response.data.email || error.response.data.error || '회원가입 실패');
+    }
+    throw new Error('네트워크 오류가 발생했습니다.');
+  }
+};
+
+// 로그인 API 요청 함수
+export const login = async (data: LoginData): Promise<Response> => {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await axios.post<Response>(`${BASE_URL}/accounts/login/`, data, {
+      headers: {
+        'X-CSRFToken': csrfToken,  // CSRF 토큰을 헤더에 포함
+      },
+      withCredentials: true,
+    });
+    return response.data; // 요청 성공 시 데이터 반환
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.detail || '로그인 실패');
+    }
+    throw new Error('네트워크 오류가 발생했습니다.');
+  }
+};
+
+// 유저 조회 API 요청 함수
+export const getUserInfo = async (): Promise<UserInfoResponse> => {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await axios.get<UserInfoResponse>(`${BASE_URL}/accounts/profile/`, {
+      headers: {
+        'X-CSRFToken': csrfToken,  // CSRF 토큰을 헤더에 포함
+      },
+      withCredentials: true,
+    });
+    return response.data; // 요청 성공 시 데이터 반환
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.detail || '유저 정보 조회 실패');
+    }
+    throw new Error('네트워크 오류가 발생했습니다.');
+  }
+};
