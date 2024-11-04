@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '@/stores/user';
 import { useNavigate } from 'react-router-dom';
+import { signUp, getUserInfo, login } from '@/apis/auth';
 
 const Index = (props: AuthBackgroundType) => {
   const { title, text1, text2, onClick1, onClick2, inputs } = props;
@@ -24,21 +25,12 @@ const Index = (props: AuthBackgroundType) => {
   const setUserState = useSetRecoilState(userState);
   const navigate = useNavigate();
 
-  const onClick = () => {
-    console.log(inputValues);
+  const onClick = async () => {
+    // console.log(inputValues);
 
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if ('password2' in inputValues) {
-      const newUser = {
-        memberNo: 1,
-        email: inputValues.email,
-        nickname: inputValues.nickname,
-        createdAt: new Date().toISOString(),
-        imageUrl: '/src/assets/images/profile.png',
-        resume: [],
-        result: [],
-      };
       if (inputValues.email === '' || inputValues.password1 === '' || inputValues.password2 === '') {
         alert('* 표시는 필수 입력사항 입니다.')
       } else if (!emailPattern.test(inputValues.email)) {
@@ -50,24 +42,61 @@ const Index = (props: AuthBackgroundType) => {
       } else if (inputValues.nickname.length > 6) {
         alert('닉네임은 6자 이하로 작성해주세요.')
       } else {
-        setUserState(newUser)
-        navigate('/')
+        try {
+          const signUpResponse = await signUp({
+            email: inputValues.email,
+            password1: inputValues.password1,
+            password2: inputValues.password2,
+            nickname: inputValues.nickname,
+          });
+
+          if (signUpResponse.message === '회원가입 성공') {
+            const userInfo = await getUserInfo()
+
+            const newUser = {
+              memberNo: userInfo['id'],
+              email: userInfo['email'],
+              nickname: userInfo['nickname'],
+              createdAt: userInfo['createdAt'],
+              imageUrl: 'src/assets/images/profile.png',
+              resume: [],
+              result: [],
+            };
+            setUserState(newUser); // 서버에서 받은 사용자 데이터 설정
+            alert('회원가입에 성공하였습니다.')
+            navigate('/'); // 회원가입 성공 시 리다이렉트
+          }
+        } catch (error: any) {
+          console.log(error.response.data); // 에러 내용을 전체 확인
+          alert(error.message); // 확인용으로 에러 메시지를 화면에 표시
+        }
       }
     } else {
-      const user = {
-        memberNo: 1,
-        email: inputValues.email,
-        nickname: 'test',
-        createdAt: new Date().toISOString(),
-        imageUrl: '/src/assets/images/profile.png',
-        resume: [],
-        result: []
-      };
       if (!emailPattern.test(inputValues.email)) {
         alert('아이디는 email 형식을 따라야 합니다.')
       } else {
-        setUserState(user)
-        navigate('/')
+        const logInResponse = await login({
+          email: inputValues.email,
+          password: inputValues.password,
+        });
+
+        if (logInResponse.message === '로그인 성공') {
+          const userInfo = await getUserInfo()
+
+          const user = {
+            memberNo: userInfo['id'],
+            email: userInfo['email'],
+            nickname: userInfo['nickname'],
+            createdAt: userInfo['createdAt'],
+            imageUrl: '/src/assets/images/profile.png',
+            resume: [], // 조회코드추가
+            result: [], // 조회코드추가
+          };
+
+          setUserState(user)
+          alert('로그인에 성공하였습니다.')
+          navigate('/')
+        }
       }
     }
   };
