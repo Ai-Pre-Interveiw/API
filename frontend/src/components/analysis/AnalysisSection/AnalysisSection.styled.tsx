@@ -17,7 +17,7 @@ export const Container = styled.div`
 
 export const Title = styled.div`
   font-weight: bold;
-  font-size: 5vh;
+  font-size: 4.5vh;
   margin-top: 5vh;
   margin-left: 3vh;
 `
@@ -53,6 +53,7 @@ export const Menu = styled.div`
   font-weight: bold;
   width: 95%;
   margin-left: 5vh;
+  font-size: 2.5vh;
 `
 
 export const Menu1 = styled.div`
@@ -106,6 +107,7 @@ export const WrapTimeCheck = styled.div`
 
 // 전체 리스트 컨테이너 스타일
 export const AnalysisList = styled.div`
+  font-size: 2.5vh;
   overflow-y: auto; /* 스크롤 가능하게 설정 */
   &::-webkit-scrollbar {
     display: none; /* 크롬, 사파리, 오페라, 엣지 */

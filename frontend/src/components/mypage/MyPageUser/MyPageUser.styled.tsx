@@ -17,10 +17,12 @@ export const Image = styled.div`
 `
 
 export const Nickname = styled.div`
+  font-size: 3vh;
   font-weight: bold;
 `
 
 export const Email = styled.div`
+  font-size: 3vh;
   font-weight: bold;
 `
 

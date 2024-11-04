@@ -198,7 +198,7 @@ export const ThinkButtonWrap = styled.div`
   align-items: center;
   justify-content: center;
   gap: 1vw;
-  width: 12vw;
+  width: 13vw;
   background-color: white;
   height: 6vh;
   border-radius: 30px;

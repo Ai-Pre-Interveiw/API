@@ -348,7 +348,7 @@ const Interviewing = () => {
         gap: '1vw',
         backgroundColor: 'white',
         height: '6vh',
-        width: '12vw',
+        width: '13vw',
         borderRadius: '30px'
       }}>
         <FullButton text={`${timer}초 남음`} onClick={() => {}} disabled/>
@@ -375,7 +375,7 @@ const Interviewing = () => {
           fontSize: '3vh',
           width: '69.6vw',
           right: '22vw',
-          zIndex: '100',
+          zIndex: '103',
           padding: '1%',
         }}>
           {modalFirstContent.texts[0]}
