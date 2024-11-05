@@ -8,6 +8,8 @@
 .venv*
 
 db.sqlite3
+.pyc
+*.pdf
 
 # User-specific stuff
 .idea/**
