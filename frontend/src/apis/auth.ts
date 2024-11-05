@@ -32,7 +32,7 @@ interface UserInfoResponse {
 }
 
 // CSRF 토큰을 가져오는 함수
-async function getCsrfToken() {
+export const getCsrfToken = async () => {
   const response = await axios.get(`${BASE_URL}/accounts/csrf-token/`, {
     withCredentials: true,  // 세션 쿠키를 포함하여 요청
   });
@@ -53,7 +53,9 @@ export const signUp = async (data: SignUpData): Promise<Response> => {
     return response.data; // 요청 성공 시 데이터 반환
   } catch (error: any) {
     if (error.response) {
-      console.log("서버 응답 에러 메시지:", error.response.data);
+      if (error.response.data.email[0] === 'user with this email already exists.') {
+        alert('이미 사용중인 이메일입니다.')
+      }
       throw new Error(error.response.data.email || error.response.data.error || '회원가입 실패');
     }
     throw new Error('네트워크 오류가 발생했습니다.');
@@ -73,6 +75,7 @@ export const login = async (data: LoginData): Promise<Response> => {
     return response.data; // 요청 성공 시 데이터 반환
   } catch (error: any) {
     if (error.response) {
+      alert(error.response.data.non_field_errors[0])
       throw new Error(error.response.data.detail || '로그인 실패');
     }
     throw new Error('네트워크 오류가 발생했습니다.');

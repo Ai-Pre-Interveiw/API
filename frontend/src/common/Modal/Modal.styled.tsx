@@ -1,5 +1,6 @@
 import { colors } from '@styles/theme'
 import styled, { keyframes } from 'styled-components'
+import Dropdown from 'react-dropdown';
 
 export const BlackBox = styled.div`
   position: fixed;
@@ -225,6 +226,104 @@ export const FinishContent = styled.div`
   margin-top: 30vh;
   animation: ${fadeInScale} 1.2s ease-out;
 `
+
+export const StyledDropdown = styled(Dropdown)`
+  width: 100%;
+  max-width: 20vw;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+
+  .Dropdown-control {
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #f7f7f7;
+    &:hover {
+      border-color: #888;
+    }
+  }
+
+  .Dropdown-placeholder {
+    color: #888;
+    font-size: 1.7vh;
+  }
+
+  .Dropdown-menu {
+    position: absolute;
+    width: 100%;
+    max-width: 20vw;
+    z-index: 101;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 15vh; /* 최대 높이를 설정 */
+    overflow-y: auto; /* 항목이 넘치면 스크롤 */
+  }
+
+  .Dropdown-option {
+    padding: 8px 12px;
+    color: #333;
+    font-size: 1em;
+    cursor: pointer;
+    &:hover {
+      background-color: #e8e8e8;
+    }
+  }
+
+  .Dropdown-option.is-selected {
+    background-color: #ccc;
+    font-weight: bold;
+  }
+`;
+
+
+export const resumeWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 25vw;
+  height: 15vh;
+  margin-top: 4vh;
+`
+
+export const labelWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 12vw;
+  align-items: center;
+  justify-content: space-between;
+
+  label {
+    font-size: 2.3vh; /* 라벨 텍스트 크기 */
+    display: flex;
+    align-items: center;
+    gap: 0.1vw;
+
+    input[type="checkbox"] {
+      width: 1.2vw; /* 체크박스 크기 */
+      height: 1.2vw;
+      accent-color: ${colors.purple}; /* 보라색으로 체크박스 색상 설정 */
+      transform: scale(1); /* 체크박스 크기를 키움 */
+    }
+  }
+`;
+
+export const NoOptionsMessage = styled.div`
+  padding: 1vh;
+  color: #888;
+  text-align: left;
+  font-size: 1.7vh;
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 20vw;
+`;
 
 // export const ModalName = styled.div`
 //   display: flex;

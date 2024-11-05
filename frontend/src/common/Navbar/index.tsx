@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { userState } from '@stores/user';
 import Modal from '@/common/Modal/index';
+import { getResume } from '@/apis/resume';
 
 const Index = (props: { current: string }) => {
   const { current } = props;
@@ -22,7 +23,7 @@ const Index = (props: { current: string }) => {
     navigate('/');
   };
 
-  const goMyPage = () => {
+  const goMyPage = async () => {
     if (current === 'interview') {
       alert('홈페이지로 이동 후 이용해주세요.')
       navigate('/')
@@ -40,7 +41,7 @@ const Index = (props: { current: string }) => {
     }
   };
 
-  const handleFirstModalOpen = () => {
+  const handleFirstModalOpen = async () => {
     if (current === 'interview') {
       alert('모의면접이 진행중입니다.')
     } else {
@@ -81,7 +82,7 @@ const Index = (props: { current: string }) => {
                 <p>환영합니다!</p>
               </n.UserInfoWrap>
               <n.ProfileButton onClick={goMyPage}>
-                <img src={user.imageUrl} alt="" />
+                <img src='/src/assets/images/profile.png' alt="" />
               </n.ProfileButton>
             </n.MentImageWrap>
           </n.LoginButtonWrap>
@@ -97,10 +98,10 @@ const Index = (props: { current: string }) => {
           texts={[
             '모의면접을',
             '시작 하시겠습니까?',
-            '시작하기 버튼을 누르면 준비페이지로 넘어갑니다.'
+            '어떤 자기소개서로 면접을 진행하시겠습니까?'
           ]}
           width="30%"
-          height="38%"
+          height="55%"
         />
       )}
 
