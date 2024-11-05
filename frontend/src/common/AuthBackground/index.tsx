@@ -6,6 +6,7 @@ import { useSetRecoilState } from 'recoil';
 import { userState } from '@/stores/user';
 import { useNavigate } from 'react-router-dom';
 import { signUp, getUserInfo, login } from '@/apis/auth';
+import { getResume } from '@/apis/resume';
 
 const Index = (props: AuthBackgroundType) => {
   const { title, text1, text2, onClick1, onClick2, inputs } = props;
@@ -52,14 +53,15 @@ const Index = (props: AuthBackgroundType) => {
 
           if (signUpResponse.message === '회원가입 성공') {
             const userInfo = await getUserInfo()
-
+            const resume = await getResume()
+            console.log(resume.data)
             const newUser = {
               memberNo: userInfo['id'],
               email: userInfo['email'],
               nickname: userInfo['nickname'],
               createdAt: userInfo['createdAt'],
-              imageUrl: 'src/assets/images/profile.png',
-              resume: [],
+              imageUrl: 'public/images/profile.png',
+              resume: resume.data,
               result: [],
             };
             setUserState(newUser); // 서버에서 받은 사용자 데이터 설정
@@ -82,14 +84,15 @@ const Index = (props: AuthBackgroundType) => {
 
         if (logInResponse.message === '로그인 성공') {
           const userInfo = await getUserInfo()
-
+          const resume = await getResume()
+          console.log(resume.data)
           const user = {
             memberNo: userInfo['id'],
             email: userInfo['email'],
             nickname: userInfo['nickname'],
             createdAt: userInfo['createdAt'],
-            imageUrl: '/src/assets/images/profile.png',
-            resume: [], // 조회코드추가
+            imageUrl: 'public/images/profile.png',
+            resume: resume.data, // 조회코드추가
             result: [], // 조회코드추가
           };
 

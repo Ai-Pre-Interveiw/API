@@ -52,7 +52,7 @@ const fadeInScale = keyframes`
 export const image = styled.div`
   width: 50%; /* 필요한 너비와 높이 설정 */
   height: 100%;
-  background-image: url('src/assets/images/main.png'); /* 이미지 경로 설정 */
+  background-image: url('public/images/main.png'); /* 이미지 경로 설정 */
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

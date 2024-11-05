@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef} from 'react'
 import Webcam from 'react-webcam'
 import Modal from '@/common/Modal/index'
 import FullButton from '@/common/Fullbutton'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation  } from 'react-router-dom'
 import { useSetRecoilState } from 'recoil';
 import { userState } from '@stores/user';
+import { getInterviewQuestions } from '@/apis/interview'
 
 const Interviewing = () => {
   const navigate = useNavigate()
@@ -20,6 +21,9 @@ const Interviewing = () => {
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false)
   const [timer, setTimer] = useState(60)
   const [currentFirstQuestion, setCurrentFirstQuestion] = useState(1)
+  const location = useLocation();
+  const interviewId = location.state?.interviewId;
+  const [questions, setQuestions] = useState([])
   const [modalFirstContent, setModalFirstContent] = useState({
     name: '질문 시작1',
     texts: [
@@ -36,6 +40,24 @@ const Interviewing = () => {
       'Q1. 1분 자기소개를 진행해주세요.'
     ]
   })
+
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        const questionsData = await getInterviewQuestions(interviewId); // 질문 데이터 비동기 요청
+        setQuestions(questionsData); // 질문 상태 설정
+      } catch (error) {
+        console.error("질문을 불러오는데 실패했습니다:", error);
+      }
+    };
+    
+    loadQuestions();
+  }, []); // 처음 한 번만 실행
+
+  useEffect(() => {
+    console.log(questions)
+  }, [questions])
+
 
   const handleFirstNextQuestion = () => {
     if (currentFirstQuestion < 10) {
@@ -92,7 +114,7 @@ const Interviewing = () => {
       {
         name: '질문 진행 01',
         texts: [
-          'Q1. 1분 자기소개를 진행해주세요.',
+          questions[0]['content'],
           '첫 번째 질문이 끝났습니다.',
           '두 번째 질문 준비를 위해 생각하기 버튼을 눌러주세요.',
         ]
@@ -100,7 +122,7 @@ const Interviewing = () => {
       {
         name: '질문 진행 02',
         texts: [
-          'Q2. Stable Diffusion을 활용한 프로젝트에서 text-inversion, lora, dreamboose 등 다양한 방법을 모색했다고 하셨는데, 각각의 방법을 선택하게 된 이유와 실제로 어떻게 적용하셨는지 구체적으로 설명해 주시겠습니까',
+          questions[1]['content'],
           '두 번째 질문이 끝났습니다.',
           '세 번째 질문 준비를 위해 생각하기 버튼을 눌러주세요.',
         ]
@@ -108,15 +130,39 @@ const Interviewing = () => {
       {
         name: '질문 진행 03',
         texts: [
-          'Q3. 우리 회사에서 일하고 싶은 이유는 무엇인가요?',
-          '마지막 질문 입니다.',
+          questions[2]['content'],
+          '세 번째 질문이 끝났습니다.',
+          '네 번째 질문 준비를 위해 생각하기 버튼을 눌러주세요.',
+        ]
+      },
+      {
+        name: '질문 진행 04',
+        texts: [
+          questions[3]['content'],
+          '네 번째 질문이 끝났습니다.',
+          '다섯 번째 질문 준비를 위해 생각하기 버튼을 눌러주세요.',
+        ]
+      },
+      {
+        name: '질문 진행 05',
+        texts: [
+          questions[4]['content'],
+          '다섯 번째 질문이 끝났습니다.',
+          '여섯 번째 질문 준비를 위해 생각하기 버튼을 눌러주세요.',
+        ]
+      },
+      {
+        name: '질문 진행 06',
+        texts: [
+          questions[5]['content'],
+          '여섯 번째 질문이 끝났습니다.',
           '마지막 질문 준비를 위해 생각하기 버튼을 눌러주세요.',
         ]
       },
       {
-        name: '질문 진행 4',
+        name: '질문 진행 7',
         texts: [
-          'Q4. 앞으로 5년 후의 목표는 무엇인가요?',
+          questions[6]['content'],
           '면접이 끝났습니다.',
           '종료하기 버튼을 눌러 홈페이지로 이동해주세요.',
         ]
@@ -129,19 +175,31 @@ const Interviewing = () => {
     const secondQuestionData = [
       {
         name: '질문 생각1',
-        texts: ['Q1. 1분 자기소개를 진행해주세요.']
+        texts: questions[0]['content']
       },
       {
         name: '질문 생각2',
-        texts: ['Q2. Stable Diffusion을 활용한 프로젝트에서 text-inversion, lora, dreamboose 등 다양한 방법을 모색했다고 하셨는데, 각각의 방법을 선택하게 된 이유와 실제로 어떻게 적용하셨는지 구체적으로 설명해 주시겠습니까']
+        texts: questions[1]['content']
       },
       {
         name: '질문 생각3',
-        texts: ['Q3. 우리 회사에서 일하고 싶은 이유는 무엇인가요?']
+        texts: questions[2]['content']
       },
       {
         name: '질문 생각4',
-        texts: ['Q4. 앞으로 5년 후의 목표는 무엇인가요?']
+        texts: questions[3]['content']
+      },
+      {
+        name: '질문 생각5',
+        texts: questions[4]['content']
+      },
+      {
+        name: '질문 생각6',
+        texts: questions[5]['content']
+      },
+      {
+        name: '질문 생각7',
+        texts: questions[6]['content']
       },
     ]
     setModalSecondContent(secondQuestionData[questionNumber - 1])
@@ -149,7 +207,7 @@ const Interviewing = () => {
 
   const handleModalClose = () => {
     setIsFirstModalOpen(false)
-    if (modalFirstContent.name === '질문 진행 4') {
+    if (modalFirstContent.name === '질문 진행 7') {
       handleSaveRecording()
       setUserState((prevUser) => ({
         ...prevUser,

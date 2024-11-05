@@ -4,12 +4,14 @@ import InterviewHeader from '@/components/interview/InterviewHeader'
 import * as i from '@pages/interview/InterviewPage.styled'
 import { useState } from 'react'
 import { Outlet } from 'react-router'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 
 const InterviewPage = () => {
   const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(1)
+  const location = useLocation();
+  const interviewId = location.state?.interviewId;
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -22,7 +24,7 @@ const InterviewPage = () => {
   }
 
   const StartInterview = () => {
-    navigate('/interviewing')
+    navigate('/interviewing', { state: { interviewId: interviewId } })
   }
 
   return (

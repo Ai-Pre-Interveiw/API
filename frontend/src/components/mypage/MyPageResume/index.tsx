@@ -45,7 +45,7 @@ const Index = () => {
               </m.ResumeItemName>
               <m.ResumeItemTimeButton>
                 {resume.uploadTime}
-                <FullButton text="로컬이라" onClick={() => {}} disabled/>
+                <FullButton text="자세히 보기" onClick={() => window.open(`${BASE_URL}/media/${resume.filePath}`, '_blank')} disabled/>
               </m.ResumeItemTimeButton>
             </m.ResumeItem> // resume의 파일명을 표시
           ))}
