@@ -1,26 +1,68 @@
 import { BASE_URL } from '@utils/requestMethods'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import * as a from '@components/analysisdetail/AnalysisDetailSection/AnalysisDetailSection.styled'
 import AnalysisDetailQuestion from '@components/analysisdetail/AnalysisDetailQuestion'
 import { useNavigate } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/stores/user'
+import { getInterviewResult } from '@/apis/interview'
 
-const AnalysisDetailSection = ({ data }: { data: { filePath: string; uploadTime: string }[] }) => {
+
+interface InterviewResult {
+  id: number,
+  video_path: string,
+  anxiety_graph_path: string,
+  gaze_distribution_path: string,
+  posture_distribution_path: string,
+  voice_distribution_path: string,
+  expression_distribution_path: string,
+  filler_word_positions: string[],
+  follow_up_questions: string[],
+  created_at: string,
+  updated_at: string,
+  interview: number,
+  question: number
+}
+
+interface AnalysisDetailSectionProps {
+  id: string; // id는 문자열로 지정
+}
+
+const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => {
   const navigate = useNavigate()
   const user = useRecoilValue(userState)
   const [selectedIndex, setSelectedIndex] = useState<number>(-1) // 기본값을 -1로 설정하여 종합분석 선택
+  const [ interviewResults, setInterviewResults ] = useState<InterviewResult[]>([]);
 
   const handleItemClick = (index: number) => {
     setSelectedIndex(index) // 선택된 항목의 인덱스를 업데이트
   }
 
+  useEffect(() => {
+    console.log(id)
+    const loadInterviews = async () => {
+      try {
+        const interviewResultData = await getInterviewResult(parseInt(id!, 10));
+        setInterviewResults(interviewResultData);
+      } catch (error) {
+        console.error("면접을 불러오는 중 오류가 발생했습니다:", error);
+      }
+    };
+    loadInterviews();
+  }, []);
+
+  useEffect(() => {
+    console.log(interviewResults)
+  }, [interviewResults]);
+
   return (
+    <>
+    {interviewResults.length > 0 ? 
     <a.Container>
       <a.Title>분석 결과</a.Title>
       <a.SecondTitle>{user.nickname} 님의</a.SecondTitle>
-      <a.ThirdTitle>{data[0].uploadTime} 진행한 모의면접 분석결과 입니다.</a.ThirdTitle>
+      <a.ThirdTitle>{interviewResults[0].updated_at} 진행한 모의면접 분석결과 입니다.</a.ThirdTitle>
       
       <a.AllWrap>
         <a.MenuWrap>
@@ -33,7 +75,7 @@ const AnalysisDetailSection = ({ data }: { data: { filePath: string; uploadTime:
           </a.MenuItem>
 
           {/* data 배열을 순회하여 메뉴 표시 */}
-          {data.map((item, index) => (
+          {interviewResults.map((item, index) => (
             <a.MenuItem 
               key={index} 
               onClick={() => handleItemClick(index)}
@@ -50,13 +92,15 @@ const AnalysisDetailSection = ({ data }: { data: { filePath: string; uploadTime:
 
       {selectedIndex !== null && selectedIndex !== -1 && (
         <a.DetailWrap>
-          <p>파일 경로: {data[selectedIndex].filePath}</p>
-          <p>업로드 시간: {data[selectedIndex].uploadTime}</p>
+          <p>파일 경로: {interviewResults[selectedIndex].video_path}</p>
+          <p>업로드 시간: {interviewResults[selectedIndex].created_at}</p>
         </a.DetailWrap>
       )}
 
       <FullButton text="뒤로 가기" onClick={() => navigate('/analysis')} disabled />
     </a.Container>
+    : <div></div>}
+    </>
   )
 }
 

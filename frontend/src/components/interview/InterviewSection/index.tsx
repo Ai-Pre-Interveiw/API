@@ -25,17 +25,25 @@ const index = (props: { image: string; texts:string[] }) => {
             <i.Text2>{texts[2]}</i.Text2>
           </i.TextWrapper2>
         </i.TextWrapper> :
-        <i.TextWrapper3>
-          <i.Text3>
-            {texts[0]} 
-          </i.Text3>
-          <i.Text3>
-            {texts[1]} 
-          </i.Text3> 
-          <i.Text3>
-            {texts[2]} 
-          </i.Text3> 
-        </i.TextWrapper3>
+        <i.TextWrapper>
+          <i.TextWrapper4>
+            <i.Text2>{texts[0]}</i.Text2>
+            <i.Text1>{texts[1]}</i.Text1>
+            <i.Text2>{texts[2]}</i.Text2>
+          </i.TextWrapper4>
+          <i.TextWrapper4>
+            <i.Text2>{texts[3]}</i.Text2>
+            <i.Text1>{texts[4]}</i.Text1>
+            <i.Text2>{texts[5]}</i.Text2>
+            <i.Text1>{texts[6]}</i.Text1>
+            <i.Text2>{texts[7]}</i.Text2>
+          </i.TextWrapper4>
+          <i.TextWrapper4>
+            <i.Text2>{texts[8]}</i.Text2>
+            <i.Text1>{texts[9]}</i.Text1>
+            <i.Text2>{texts[10]}</i.Text2>
+          </i.TextWrapper4>
+        </i.TextWrapper>
       }
     </i.Container>
   )

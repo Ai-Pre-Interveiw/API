@@ -69,13 +69,13 @@ const Index = (props: { current: string }) => {
         </n.image>
         {user.memberNo === -1 ? (
           <n.ButtonWrap>
-            <FullButton text="모의 면접" onClick={NoLoginClick} disabled />
-            <FullButton text="분석 결과" onClick={NoLoginClick} disabled />
+            <FullButton text="모의면접" onClick={NoLoginClick} disabled />
+            <FullButton text="분석결과" onClick={NoLoginClick} disabled />
           </n.ButtonWrap>
         ) : (
           <n.LoginButtonWrap>
-            <FullButton text="모의 면접" onClick={handleFirstModalOpen} disabled/>
-            <FullButton text="분석 결과" onClick={goAnalysisPage} disabled/>
+            <FullButton text="모의면접" onClick={handleFirstModalOpen} disabled/>
+            <FullButton text="분석결과" onClick={goAnalysisPage} disabled/>
             <n.MentImageWrap>
               <n.UserInfoWrap>
                 <p>{user.nickname} 님</p>

@@ -6,7 +6,9 @@ const index = (props: FullButtonType) => {
 
   return (
     <f.Button onClick={onClick}>
-      {text}
+      <f.textWrap>
+        {text}
+      </f.textWrap>
     </f.Button>
   )
 }

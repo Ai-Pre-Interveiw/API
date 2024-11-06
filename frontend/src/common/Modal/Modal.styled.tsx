@@ -29,7 +29,7 @@ export const Container = styled.div`
 const fadeInScale = keyframes`
   from {
     opacity: 0;
-    transform: scale(0.9); /* 처음에 약간 작은 상태로 시작 */
+    transform: scale(1); /* 처음에 약간 작은 상태로 시작 */
   }
   to {
     opacity: 1;

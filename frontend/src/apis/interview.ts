@@ -9,6 +9,35 @@ interface CreateInterviewData {
   experience_level: string; // '신입' 또는 '경력'
 }
 
+interface CreateInterviewResultData {
+  interview: number;  // 면접 ID
+  question: number;   // 질문 ID
+  video_path?: string;  // 비디오 파일 경로
+  anxiety_graph_path?: string;  // 긴장도 그래프 경로
+  gaze_distribution_path?: string;  // 시선 분포 그래프 경로
+  posture_distribution_path?: string;  // 자세 분포 그래프 경로
+  voice_distribution_path?: string;  // 목소리 분포 그래프 경로
+  expression_distribution_path?: string;  // 표정 분포 그래프 경로
+  filler_word_positions?: number[];  // 미사여구 위치 리스트
+  follow_up_positions?: { [key: string]: string }[];  // 꼬리질문 위치와 질문 리스트
+}
+
+export const getAllInterviews = async () => {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await axios.get(`${BASE_URL}/resume/interviews/`, {
+      headers: {
+        'X-CSRFToken': csrfToken, // CSRF 토큰 포함
+      },
+      withCredentials: true, // 인증 쿠키가 필요한 경우 설정
+    });
+    return response.data; // 면접 데이터 반환
+  } catch (error) {
+    console.error("면접 조회 오류:", error);
+    throw error;
+  }
+};
+
 // Interview 생성 요청 함수
 export const createInterview = async (data: CreateInterviewData) => {
   try {
@@ -44,6 +73,71 @@ export const getInterviewQuestions = async (interviewId: number) => {
     return response.data; // 성공 시 질문 데이터 반환
   } catch (error) {
     console.error("질문 조회 오류:", error);
+    throw error;
+  }
+};
+
+// InterviewResult 생성 요청 함수
+export const createInterviewResult = async (data: FormData) => {
+  try {
+    const csrfToken = await getCsrfToken(); // CSRF 토큰을 가져오는 함수가 있다고 가정
+    const response = await axios.post(
+      `${BASE_URL}/resume/results/create/`,
+      data,
+      {
+        headers: {
+          'X-CSRFToken': csrfToken, // CSRF 토큰 포함
+        },
+        withCredentials: true, // 인증 쿠키가 필요한 경우 설정
+      }
+    );
+    console.log('Interview Result created:', response.data);
+    return response.data; // 성공 시 생성된 InterviewResult 데이터 반환
+  } catch (error: any) {
+    console.error('Interview Result creation failed:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// InterviewResult 수정 요청 함수
+export const updateInterviewResult = async (resultId: number, data: Partial<CreateInterviewResultData>) => {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await axios.put(
+      `${BASE_URL}/resume/interviews/results/${resultId}/update/`,
+      data,
+      {
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        withCredentials: true,
+      }
+    );
+    console.log('Interview Result updated:', response.data);
+    return response.data; // 성공 시 수정된 InterviewResult 데이터 반환
+  } catch (error: any) {
+    console.error('Interview Result update failed:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// InterviewResult 조회 요청 함수
+export const getInterviewResult = async (interviewId: number) => {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await axios.get(
+      `${BASE_URL}/resume/interviews/${interviewId}/results/`,
+      {
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        withCredentials: true,
+      }
+    );
+    console.log('Interview Result retrieved:', response.data);
+    return response.data; // 성공 시 조회된 InterviewResult 데이터 반환
+  } catch (error: any) {
+    console.error('Interview Result retrieval failed:', error.response?.data || error.message);
     throw error;
   }
 };

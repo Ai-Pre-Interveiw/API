@@ -114,13 +114,13 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
   };
 
   // 타이머 상태 설정
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(100000);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
 
   // 5초 타이머 자동 시작
   useEffect(() => {
     if (name.includes('생각')) {
-      setCountdown(30); // 타이머를 5초로 초기화
+      setCountdown(100000); // 타이머를 5초로 초기화
       setIsCountdownActive(true); // 타이머 시작
     }
   }, [name]);

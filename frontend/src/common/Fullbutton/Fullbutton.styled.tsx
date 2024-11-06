@@ -22,3 +22,11 @@ export const Button = styled.button`
     border: 2px solid ${colors.purple}; /* hover 시 보라색 테두리 추가 */
   }
 `;
+
+export const textWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.1vw;
+`

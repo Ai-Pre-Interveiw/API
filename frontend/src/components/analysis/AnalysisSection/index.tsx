@@ -1,21 +1,49 @@
 import { BASE_URL } from '@utils/requestMethods'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as a from '@components/analysis/AnalysisSection/AnalysisSection.styled'
 import { Navigate, useNavigate } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 import { useRecoilValue } from 'recoil';
 import { userState } from '@/stores/user';
+import { getAllInterviews } from '@/apis/interview';
+
+interface Interview {
+  id: number;
+  scheduled_start: string;
+  position: string;
+  experience_level: string;
+  // 필요한 다른 필드도 정의합니다
+}
 
 const index = () => {
   const user = useRecoilValue(userState);
   const navigate = useNavigate()
+  const [interviews, setInterviews] = useState<Interview[]>([]);
+
+  // 페이지 로드 시 인터뷰 조회 요청
+  useEffect(() => {
+    const loadInterviews = async () => {
+      try {
+        const interviewData = await getAllInterviews();
+        setInterviews(interviewData);
+      } catch (error) {
+        console.error("면접을 불러오는 중 오류가 발생했습니다:", error);
+      }
+    };
+    loadInterviews();
+  }, []);
+
+  useEffect(() => {
+    // console.log(interviews)
+  }, [interviews]);
+
   return (
     <a.Container>
       <a.Title>
         면접분석
       </a.Title>
       <a.Summary>
-        <a.SummaryNum>{(user.result?.length || 0)}</a.SummaryNum>
+        <a.SummaryNum>{(interviews?.length || 0)}</a.SummaryNum>
         <a.SummaryText>&nbsp;건의 면접 분석 결과가 있습니다.</a.SummaryText>
       </a.Summary>
       <a.Menu>
@@ -31,19 +59,19 @@ const index = () => {
           </div>
         </a.Menu2>
       </a.Menu>
-      {user.result && user.result.length > 0 ? 
+      {interviews && interviews.length > 0 ? 
         <a.AnalysisList>
-          {user.result.map((result, index) => (
+          {interviews.map((result, index) => (
             <a.AnlaysisItem>
-                <video
+                {/* <video
                   src={result[0].filePath} // 비디오 파일 URL을 생성
                   width="200vw" // 원하는 크기로 설정
                   height="120vh"
                   controls // 비디오 컨트롤(재생, 일시 정지 등) 표시
-                />
+                /> */}
               <a.AnalysisItemTimeButton>
-                {result[0].uploadTime}
-                <FullButton text="결과보기" onClick={() => navigate(`/analysis/${index}`)} disabled/>
+                {result.scheduled_start}
+                <FullButton text="결과보기" onClick={() => navigate(`/analysis/${result.id}`)} disabled/>
               </a.AnalysisItemTimeButton>
             </a.AnlaysisItem>
           ))}
