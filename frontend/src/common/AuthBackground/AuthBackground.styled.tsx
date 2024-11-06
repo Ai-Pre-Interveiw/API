@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 70vh;
+  width: 60vh;
   height: 70vh;
   justify-content: center;
   align-items: center;
@@ -11,6 +11,7 @@ export const Container = styled.div`
   border-radius: 50px;
   box-shadow: 6px 4px 18px 3px rgba(0, 0, 0, 0.1);
   position: relative; /* 고정 요소 위치 설정을 위해 relative 추가 */
+  margin-right: 2vw;
 `;
 
 export const Title = styled.h1`
@@ -35,7 +36,7 @@ export const loginContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 70%;
+  width: 75%;
   height: 30%;
   gap: 5vh;
   `
@@ -45,7 +46,7 @@ export const signupContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 70%;
+  width: 75%;
   height: 60%;
   gap: 2vh;
 `

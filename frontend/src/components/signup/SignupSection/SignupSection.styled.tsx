@@ -51,7 +51,7 @@ const bounceUpRight = keyframes`
 
 export const image = styled.div`
   width: 30%; /* 필요한 너비와 높이 설정 */
-  height: 60%;
+  height: 65%;
   background-image: url('src/assets/images/login.png'); /* 이미지 경로 설정 */
   background-size: contain;
   background-repeat: no-repeat;

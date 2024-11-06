@@ -7,12 +7,13 @@ import { Outlet } from 'react-router'
 import { useNavigate, useLocation } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 
+
 const InterviewPage = () => {
   const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(1)
   const location = useLocation();
   const interviewId = location.state?.interviewId;
-
+  
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1)
@@ -36,7 +37,7 @@ const InterviewPage = () => {
           image='src/assets/images/interview1.png'
           texts={[
             '실전 면접에',
-            '임한 다는 마음가짐으로',
+            '임한다는 마음가짐으로',
             '복장을 단정히하고 면접을 진행해주세요.'
           ]}/> :
       currentPage === 2 ?
@@ -52,9 +53,9 @@ const InterviewPage = () => {
         key={currentPage}
         image=''
         texts={[
-          '질문은 총 7개로 구성되어 있고',
-          '생각 시간은 30초 대답시간은 60초 입니다.',
-          '면접은 약 10분간 진행될 예정입니다.'
+          '질문은 총', '7개', '로 구성되며',
+          '생각 시간은', '30초', '대답시간은', '60초', '입니다.',
+          '면접은 약', '10분', '간 진행될 예정입니다.'
         ]}/> 
       }
       <InterviewFooter />

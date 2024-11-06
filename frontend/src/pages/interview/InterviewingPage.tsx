@@ -6,6 +6,7 @@ import { useNavigate, useLocation  } from 'react-router-dom'
 import { useSetRecoilState } from 'recoil';
 import { userState } from '@stores/user';
 import { getInterviewQuestions } from '@/apis/interview'
+import { createInterviewResult } from '@/apis/interview'
 
 const Interviewing = () => {
   const navigate = useNavigate()
@@ -19,7 +20,7 @@ const Interviewing = () => {
   })
   const [isFirstModalOpen, setIsFirstModalOpen] = useState(true)
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false)
-  const [timer, setTimer] = useState(60)
+  const [timer, setTimer] = useState(1000000)
   const [currentFirstQuestion, setCurrentFirstQuestion] = useState(1)
   const location = useLocation();
   const interviewId = location.state?.interviewId;
@@ -220,7 +221,7 @@ const Interviewing = () => {
       if (modalFirstContent.name.includes('0')) {
         handleSecondModalOpen()
         handleSaveRecording()
-        setTimer(60) // 타이머를 초기화
+        setTimer(1000000) // 타이머를 초기화
       }
     }, 100)
   }
@@ -274,40 +275,55 @@ const Interviewing = () => {
       handleFirstNextQuestion()
     }
     setIsFirstModalOpen(true)
-    setTimer(60)
+    setTimer(100000)
   }
 
   const [videoList, setVideoList] = useState<{ filePath: string; uploadTime: string }[]>([]);
 
-  const handleSaveRecording = () => {
+  const handleSaveRecording = async () => {
     const blob = new Blob(recordedChunks, { type: 'video/webm' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.style.display = 'none'
-    a.href = url
 
-    const fileName = `recorded_video_${new Date().toISOString()}.webm`;
-    const filePath = `src/assets/data/videos/${fileName}`; // 원하는 경로를 지정합니다
-    a.download = fileName;
+    const formData = new FormData();
+    formData.append('interview', interviewId.toString());  // 면접 ID
+    formData.append('question', (((interviewId - 1) * 8) + currentSecondQuestion - 1).toString()); // 질문 ID
+    formData.append('video_path', blob, `recorded_video_${new Date().toISOString()}.webm`);  // 파일 데이터 추가
 
-    document.body.appendChild(a)
-    a.click()
-    URL.revokeObjectURL(url)
+    if (currentSecondQuestion === 1) {
+      console.log(interviewId)
+      console.log(((interviewId) * 8))
+      const response = await createInterviewResult(formData);
+    } else {
+      console.log(interviewId)
+      console.log(((interviewId - 1) * 8) + currentSecondQuestion - 1)
+      const response = createInterviewResult(formData);
+    }
+    // const url = URL.createObjectURL(blob)
+    // const a = document.createElement('a')
+    // a.style.display = 'none'
+    // a.href = url
+
+    // const fileName = `recorded_video_${new Date().toISOString()}.webm`;
+    // const filePath = `src/assets/data/videos/${fileName}`; // 원하는 경로를 지정합니다
+    // a.download = fileName;
+
+    // document.body.appendChild(a)
+    // a.click()
+    // URL.revokeObjectURL(url)
 
     // 업로드 시간 포맷
-    const uploadTime = new Intl.DateTimeFormat('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    }).format(new Date());
+    // const uploadTime = new Intl.DateTimeFormat('ko-KR', {
+    //   year: 'numeric',
+    //   month: '2-digit',
+    //   day: '2-digit',
+    //   hour: '2-digit',
+    //   minute: '2-digit',
+    //   hour12: true,
+    // }).format(new Date());
 
-    if (currentFirstQuestion !== 1) {
-      // user의 result 업데이트
-      setVideoList((prevList) => [...prevList, { filePath, uploadTime }]);
-    }
+    // if (currentFirstQuestion !== 1) {
+    //   // user의 result 업데이트
+    //   setVideoList((prevList) => [...prevList, { filePath, uploadTime }]);
+    // }
 
     setRecordedChunks([])
   }
@@ -450,7 +466,7 @@ const Interviewing = () => {
           bottom: 0,
           width: '60vw',
           height: '90vh',
-          opacity: 0.4
+          opacity: 0.2
         }}
       />
 
