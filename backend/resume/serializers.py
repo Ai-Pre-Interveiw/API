@@ -1,6 +1,6 @@
 # accounts/serializers.py
 from rest_framework import serializers
-from .models import Resume, Question, Interview
+from .models import Resume, Question, Interview, InterviewResult
 
 class ResumeGetSerializer(serializers.ModelSerializer):
     filePath = serializers.CharField(source="file.name")  # 파일 이름
@@ -35,3 +35,8 @@ class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
         fields = ['id', 'resume', 'scheduled_start', 'position', 'experience_level']  # 면접 생성에 필요한 필드들
+
+class InterviewResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterviewResult
+        fields = '__all__'  # 필요한 모든 필드를 포함

@@ -37,3 +37,27 @@ class Question(models.Model):
 
     def __str__(self):
         return f"Question for Interview ID {self.interview.id} - {self.created_at}"
+
+
+# 면접 결과 모델
+class InterviewResult(models.Model):
+    interview = models.ForeignKey(Interview, on_delete=models.CASCADE, related_name='results')  # 면접과 연결
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='results')  # 질문과 연결
+    
+    # 파일 경로 및 그래프 경로들
+    video_path = models.FileField(upload_to="interview_videos/", blank=True, null=True)  # 질문별 녹화 파일 경로
+    anxiety_graph_path = models.FileField(upload_to="graphs/anxiety/", blank=True, null=True)  # 긴장도 그래프 이미지 경로
+    gaze_distribution_path = models.FileField(upload_to="graphs/gaze/", blank=True, null=True)  # 시선 분포 그래프 이미지 경로
+    posture_distribution_path = models.FileField(upload_to="graphs/posture/", blank=True, null=True)  # 자세 분포 그래프 이미지 경로
+    voice_distribution_path = models.FileField(upload_to="graphs/voice/", blank=True, null=True)  # 목소리 분포 그래프 이미지 경로
+    expression_distribution_path = models.FileField(upload_to="graphs/expression/", blank=True, null=True)  # 표정 분포 그래프 이미지 경로
+
+    # 추가 분석 데이터
+    filler_word_positions = models.JSONField(default=list, blank=True)  # 미사여구 위치 리스트
+    follow_up_questions = models.JSONField(default=list, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성 시간
+    updated_at = models.DateTimeField(auto_now=True)  # 업데이트 시간
+
+    def __str__(self):
+        return f"Result for Interview ID {self.interview.id} - Question ID {self.question.id}"
