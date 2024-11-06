@@ -15,6 +15,16 @@ import pickle
 import time
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+import math
+import time
+import datetime
+
+start = time.time()
+
+
+
+
+
 
 
 def calculate_angle(a,b):
@@ -45,7 +55,7 @@ RIGHT_EYE_INDEXES = [362, 398, 384, 385, 386, 387, 388, 466, 263, 249, 390, 373,
 LEFT_IRIS_INDEXES = [469, 470, 471, 472]
 RIGHT_IRIS_INDEXES = [474, 475, 476, 477]
 
-cap = cv2.VideoCapture("C:/Users/USER/Downloads/recorded_video_2024-11-04T02_55_59.985Z.webm")
+cap = cv2.VideoCapture("C:/Users/USER/Pictures/Camera Roll/WIN_20241011_17_14_41_Pro.mp4")
 
 def get_eye_region(landmarks, indexes, scale_x, scale_y):
     # 랜드마크 좌표를 사용하여 눈 영역 추출
@@ -386,7 +396,7 @@ pose_counts, pose_bins = np.histogram(pose_data, bins=20)
 
 plt.figure(figsize=(8, 5))
 ax = plt.gca()
-print(pose_counts)
+
 for i in range(len(pose_bins) - 1):
     if pose_counts[i] != 0:
         x = pose_bins[i]
@@ -398,7 +408,6 @@ for i in range(len(pose_bins) - 1):
         rect_pose = FancyBboxPatch((x, 0), width, height,
                             boxstyle="round,pad=0,rounding_size=0.01",
                             edgecolor="white", facecolor="#9137fc", zorder=5)
-        print(rect_pose)
         ax.add_patch(rect_pose)
 
 # 축 범위 설정
@@ -418,7 +427,7 @@ plt.title('pose_normal_distribution')
 # print(first_angle)
 plt.savefig('C:/Users/USER/Desktop/API/API/ai/eye_pose_detection/output_plot/pose/posepy_test', bbox_inches='tight')
 
-plt.show()
+# plt.show()
 # plt.close()
 
 
@@ -474,5 +483,10 @@ plt.title('eye_normal_distribution')
 
 plt.savefig('C:/Users/USER/Desktop/API/API/ai/eye_pose_detection/output_plot/eye/eyepy_test_2', bbox_inches='tight')
 
+end = time.time()
 
+
+sec = (end - start)
+result = datetime.timedelta(seconds=sec)
+print(result)
 
