@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Resume, Question, Interview
-from .serializers import ResumeGetSerializer, ResumeUploadSerializer, QuestionSerializer, InterviewSerializer
+from .models import Resume, Question, Interview, InterviewResult
+from .serializers import ResumeGetSerializer, ResumeUploadSerializer, QuestionSerializer, InterviewSerializer, InterviewResultSerializer
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -41,7 +41,17 @@ def interview_questions(request, interview_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Interview.DoesNotExist:
         return Response({"error": "Interview not found"}, status=status.HTTP_404_NOT_FOUND)
-    
+
+
+# 모든 면접 조회
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_interviews(request):
+    interviews = Interview.objects.filter(resume__user=request.user)
+    serializer = InterviewSerializer(interviews, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 # 기본 질문 리스트 설정
 DEFAULT_QUESTIONS = [
     "자기 소개를 해주세요.",
@@ -50,7 +60,8 @@ DEFAULT_QUESTIONS = [
     "팀 프로젝트에서 맡았던 역할은 무엇인가요?",
     "최근 읽은 책이나 관심 있는 주제가 무엇인가요?",
     "입사 후 이루고 싶은 목표는 무엇인가요?",
-    "해결하기 어려웠던 경험과 극복 방법은 무엇인가요?"
+    "해결하기 어려웠던 경험과 극복 방법은 무엇인가요?",
+    "test",
 ]
 
 @api_view(['POST'])
@@ -67,3 +78,38 @@ def create_interview(request):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# 면접 결과 생성
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_interview_result(request):
+    serializer = InterviewResultSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()  # 유효한 데이터로 저장
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# 면접 결과 수정
+@api_view(['PUT'])
+def update_interview_result(request, pk):
+    try:
+        interview_result = InterviewResult.objects.get(pk=pk)
+    except InterviewResult.DoesNotExist:
+        return Response({'error': 'InterviewResult not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = InterviewResultSerializer(interview_result, data=request.data, partial=True)  # 부분 업데이트 허용
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def interview_results_by_interview_id(request, interview_id):
+    try:
+        # 면접 ID에 해당하는 모든 면접 결과 조회
+        interview_results = InterviewResult.objects.filter(interview__id=interview_id)
+        serializer = InterviewResultSerializer(interview_results, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Interview.DoesNotExist:
+        return Response({"error": "Interview not found"}, status=status.HTTP_404_NOT_FOUND)
