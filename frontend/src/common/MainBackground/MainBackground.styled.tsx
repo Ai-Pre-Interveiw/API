@@ -46,7 +46,7 @@ export const Slide = styled.div<{ isActive: boolean }>`
   width: 100%;
   height: 100%;
   position: absolute;
-  animation: ${({ isActive }) => (isActive ? fadeSlideIn : fadeSlideOut)} 1s ease-in-out;
+  animation: ${({ isActive }) => (isActive ? fadeSlideIn : fadeSlideOut)} 1s ease-in-out forwards;
   opacity: ${({ isActive }) => (isActive ? 1 : 0)};
 `;
 

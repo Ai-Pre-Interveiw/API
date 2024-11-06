@@ -51,13 +51,14 @@ const bounceUpRight = keyframes`
 
 export const image = styled.div`
   width: 30%; /* 필요한 너비와 높이 설정 */
-  height: 60%;
+  height: 65%;
   background-image: url('src/assets/images/login.png'); /* 이미지 경로 설정 */
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   animation: ${fadeInScale} 0.8s ease-out; /* 애니메이션 적용 */
   position: relative;
+  // background-color: yellow;
 `
 
 // 작은 이미지 스타일

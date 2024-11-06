@@ -5,10 +5,10 @@ export const Container = styled.div`
   display: flex;
   flex-direction: row;
   padding-left: 5%;
-  padding-right: 10%;
+  padding-right: 5%;
   width: 100%;
   height: 77vh;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   row-gap: 5%;
 `
@@ -22,6 +22,17 @@ const fadeInScale = keyframes`
   from {
     opacity: 0;
     transform: scale(0.9); /* 처음에 약간 작은 상태로 시작 */
+  }
+  to {
+    opacity: 1;
+    transform: scale(1); /* 원래 크기로 확대 */
+  }
+`
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(1); /* 처음에 약간 작은 상태로 시작 */
   }
   to {
     opacity: 1;
@@ -48,8 +59,8 @@ export const TextWrapper = styled.div`
   height: 10vh;
   width: 40vw;
   gap: 5vh;
-  opacity: 0; /* 초기 상태에서 요소가 보이지 않도록 설정 */
-  animation: ${fadeInScale} 0.8s ease-out forwards; /* 애니메이션 적용 후 보이도록 설정 */
+  // opacity: 0; /* 초기 상태에서 요소가 보이지 않도록 설정 */
+  // animation: ${fadeInScale} 0.8s ease-out forwards; /* 애니메이션 적용 후 보이도록 설정 */
   animation-delay: 0.2s; /* 약간의 딜레이 추가 */
 `;
 
@@ -58,8 +69,8 @@ export const TextWrapper2 = styled.div`
   flex-direction: column;
   align-items: left;
   gap: 1vh;
-  opacity: 0; /* 초기 상태에서 요소가 보이지 않도록 설정 */
-  animation: ${fadeInScale} 0.8s ease-out forwards; /* 애니메이션 적용 후 보이도록 설정 */
+  // opacity: 0; /* 초기 상태에서 요소가 보이지 않도록 설정 */
+  // animation: ${fadeInScale} 0.8s ease-out forwards; /* 애니메이션 적용 후 보이도록 설정 */
   animation-delay: 0.4s; /* 텀을 더 크게 설정 */
 `;
 
@@ -67,6 +78,8 @@ export const Text1 = styled.div`
   font-size: 5vh;
   font-weight: bold;
   color: ${colors.purple};
+  margin-left: 0.5vw;
+  margin-right: 0.5vw;
 `;
 
 export const Text2 = styled.div`
@@ -85,9 +98,20 @@ export const TextWrapper3 = styled.div`
   width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 10vh;
-  animation: ${fadeInScale} 0.8s ease-out;
+  // gap: 10vh;
+  animation: ${fadeIn} 0.8s ease-out;
 `
+
+export const TextWrapper4 = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: end;
+  justify-content: center;
+  // gap: 10vh;
+  animation: ${fadeIn} 0.8s ease-out;
+`
+
 
 // 작은 이미지 스타일
 // export const SmallImageUpLeft = styled.div`
