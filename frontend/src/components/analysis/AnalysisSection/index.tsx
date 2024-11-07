@@ -6,19 +6,21 @@ import FullButton from '@common/Fullbutton/index'
 import { useRecoilValue } from 'recoil';
 import { userState } from '@/stores/user';
 import { getAllInterviews } from '@/apis/interview';
+import { getResume } from '@/apis/resume';
 
 interface Interview {
   id: number;
   scheduled_start: string;
   position: string;
   experience_level: string;
-  // 필요한 다른 필드도 정의합니다
+  resume: number;
 }
 
-const index = () => {
+const Index = () => {
   const user = useRecoilValue(userState);
   const navigate = useNavigate()
   const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [resumes, setResumes] = useState<{ id: number; filePath: string; uploadTime: string }[]>([]);
 
   // 페이지 로드 시 인터뷰 조회 요청
   useEffect(() => {
@@ -30,11 +32,16 @@ const index = () => {
         console.error("면접을 불러오는 중 오류가 발생했습니다:", error);
       }
     };
+    const loadResumes = async () => {
+      const resumes = await getResume();
+      setResumes(resumes.data)
+    };
+    loadResumes();
     loadInterviews();
   }, []);
 
   useEffect(() => {
-    // console.log(interviews)
+    console.log(interviews)
   }, [interviews]);
 
   return (
@@ -48,7 +55,7 @@ const index = () => {
       </a.Summary>
       <a.Menu>
         <a.Menu1>
-          미리보기
+          기반 자기소개서
         </a.Menu1>
         <a.Menu2>
           <div>
@@ -61,20 +68,30 @@ const index = () => {
       </a.Menu>
       {interviews && interviews.length > 0 ? 
         <a.AnalysisList>
-          {interviews.map((result, index) => (
-            <a.AnlaysisItem>
-                {/* <video
-                  src={result[0].filePath} // 비디오 파일 URL을 생성
-                  width="200vw" // 원하는 크기로 설정
-                  height="120vh"
-                  controls // 비디오 컨트롤(재생, 일시 정지 등) 표시
-                /> */}
-              <a.AnalysisItemTimeButton>
-                {result.scheduled_start}
-                <FullButton text="결과보기" onClick={() => navigate(`/analysis/${result.id}`)} disabled/>
-              </a.AnalysisItemTimeButton>
-            </a.AnlaysisItem>
-          ))}
+          {[...interviews].reverse().map((result, index) => {
+            // resumes 배열에서 result.resume과 id가 일치하는 항목 찾기
+            const matchingResume = resumes.find((resume) => resume.id === result.resume);
+            
+            return (
+              <a.AnlaysisItem key={index}>
+                {matchingResume && (
+                  <a.SummaryText>{matchingResume.filePath.split('/').pop()}</a.SummaryText>
+                )}
+                <a.AnalysisItemTimeButton>
+                  {new Intl.DateTimeFormat('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true, // 오후/오전 표시
+                    timeZone: 'Asia/Seoul' // 한국 시간대 설정
+                  }).format(new Date(result.scheduled_start))}
+                  <FullButton text="결과보기" onClick={() => navigate(`/analysis/${result.id}`)} disabled/>
+                </a.AnalysisItemTimeButton>
+              </a.AnlaysisItem>
+            );
+          })}
         </a.AnalysisList>
       : 
       <a.WrapContent>
@@ -84,4 +101,4 @@ const index = () => {
   )
 }
 
-export default index
+export default Index

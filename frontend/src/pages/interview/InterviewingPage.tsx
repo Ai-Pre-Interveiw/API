@@ -7,6 +7,7 @@ import { useSetRecoilState } from 'recoil';
 import { userState } from '@stores/user';
 import { getInterviewQuestions } from '@/apis/interview'
 import { createInterviewResult } from '@/apis/interview'
+import * as i from '@pages/interview/Interviewing.styled'
 
 const Interviewing = () => {
   const navigate = useNavigate()
@@ -215,6 +216,7 @@ const Interviewing = () => {
         result: [...(prevUser.result || []), [...videoList]], // videoList를 result에 추가
       }));
       setVideoList([]);
+      toggleFullScreen();
       navigate('/')
     }
     setTimeout(() => {
@@ -281,49 +283,30 @@ const Interviewing = () => {
   const [videoList, setVideoList] = useState<{ filePath: string; uploadTime: string }[]>([]);
 
   const handleSaveRecording = async () => {
+    // console.log(recordedChunks);
     const blob = new Blob(recordedChunks, { type: 'video/webm' })
 
-    const formData = new FormData();
-    formData.append('interview', interviewId.toString());  // 면접 ID
-    formData.append('question', (((interviewId - 1) * 8) + currentSecondQuestion - 1).toString()); // 질문 ID
-    formData.append('video_path', blob, `recorded_video_${new Date().toISOString()}.webm`);  // 파일 데이터 추가
-
     if (currentSecondQuestion === 1) {
-      console.log(interviewId)
-      console.log(((interviewId) * 8))
+      // console.log(interviewId)
+      // console.log(((interviewId) * 8))
+    
+      const formData = new FormData();
+      formData.append('interview', interviewId.toString());  // 면접 ID
+      formData.append('question', (interviewId * 8).toString()); // 질문 ID
+      formData.append('video_path', blob, `recorded_video_${new Date().toISOString()}.webm`);  // 파일 데이터 추가
+      
       const response = await createInterviewResult(formData);
     } else {
-      console.log(interviewId)
-      console.log(((interviewId - 1) * 8) + currentSecondQuestion - 1)
+      // console.log(interviewId)
+      // console.log(((interviewId - 1) * 8) + currentSecondQuestion - 1)
+      
+      const formData = new FormData();
+      formData.append('interview', interviewId.toString());  // 면접 ID
+      formData.append('question', (((interviewId - 1) * 8) + currentSecondQuestion - 1).toString()); // 질문 ID
+      formData.append('video_path', blob, `recorded_video_${new Date().toISOString()}.webm`);  // 파일 데이터 추가
+
       const response = createInterviewResult(formData);
     }
-    // const url = URL.createObjectURL(blob)
-    // const a = document.createElement('a')
-    // a.style.display = 'none'
-    // a.href = url
-
-    // const fileName = `recorded_video_${new Date().toISOString()}.webm`;
-    // const filePath = `src/assets/data/videos/${fileName}`; // 원하는 경로를 지정합니다
-    // a.download = fileName;
-
-    // document.body.appendChild(a)
-    // a.click()
-    // URL.revokeObjectURL(url)
-
-    // 업로드 시간 포맷
-    // const uploadTime = new Intl.DateTimeFormat('ko-KR', {
-    //   year: 'numeric',
-    //   month: '2-digit',
-    //   day: '2-digit',
-    //   hour: '2-digit',
-    //   minute: '2-digit',
-    //   hour12: true,
-    // }).format(new Date());
-
-    // if (currentFirstQuestion !== 1) {
-    //   // user의 result 업데이트
-    //   setVideoList((prevList) => [...prevList, { filePath, uploadTime }]);
-    // }
 
     setRecordedChunks([])
   }
@@ -367,24 +350,48 @@ const Interviewing = () => {
     checkMicStatus()
   }, [isMicActive])
 
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+
+  // 전체화면 토글 함수
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen()
+        .then(() => setIsFullScreen(true))
+        .catch(err => console.error("Failed to enter fullscreen:", err))
+    } else {
+      document.exitFullscreen()
+        .then(() => setIsFullScreen(false))
+        .catch(err => console.error("Failed to exit fullscreen:", err))
+    }
+  }
+
+  useEffect(() => {
+    // F11을 누른 효과를 위해 컴포넌트가 마운트될 때 전체화면으로 전환
+    toggleFullScreen()
+  }, [])
+  
   return (
-    <div style={{
+    <div
+      ref={containerRef}
+      style={{
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
+      width: '100vw',
       height: '100vh',
-      position: 'relative'
-    }}>
+      position: 'relative',
+      backgroundColor: 'black',
+      }}
+    >
       <Webcam
         audio={true}
         ref={webcamRef}
         mirrored
         style={{
-          width: videoSize.width,
-          height: videoSize.height,
+          width: '100vw',
+          height: '100vh',
           objectFit: 'cover',
-          borderRadius: '10px',
-          position: 'relative',
         }}
       />
 
@@ -392,8 +399,8 @@ const Interviewing = () => {
       {currentFirstQuestion == 1 ?
         <div style={{
           position: 'absolute',
-          bottom: '10vh',
-          right: '10vw',
+          bottom: '18vh',
+          right: '4vw',
           width: '9vw',
           height: '1vh',
           backgroundColor: 'lightgray',
@@ -413,19 +420,12 @@ const Interviewing = () => {
 
       <div style={{
         position: 'absolute',
-        right: '8.5vw',
-        bottom: '2vh',
+        right: '5vw',
+        bottom: '10vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'row',
-        gap: '1vw',
-        backgroundColor: 'white',
-        height: '6vh',
-        width: '13vw',
-        borderRadius: '30px'
       }}>
-        <FullButton text={`${timer}초 남음`} onClick={() => {}} disabled/>
         <FullButton text='답변완료' onClick={() => {
          if (isMicActive) {
           stopRecording()
@@ -435,25 +435,45 @@ const Interviewing = () => {
         }} disabled={timer === 0}/>
       </div>
 
+      <div style={{
+        position: 'absolute',
+        right: '5vw',
+        top: '5vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: timer <= 10 ? 'red' : 'white',
+        height: '6vh',
+        width: '6.8vw',
+        borderRadius: '30px',
+        fontWeight: 'bold',
+        fontSize: '2vh',
+        color: timer <= 10 ? 'white' : 'black'
+      }}>
+        {timer}초
+      </div>
+
+      <div style={{
+        position: 'absolute',
+        left: '5vw',
+        top: '5vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        height: '6vh',
+        width: '6.8vw',
+        borderRadius: '30px',
+        fontWeight: 'bold',
+        fontSize: '2vh',
+      }}>
+        {currentSecondQuestion - 1} / 7
+      </div>
+
       {modalFirstContent.name.includes('진행') && !isFirstModalOpen ?
-        <div style={{
-          position: 'absolute',
-          bottom: '1.6vh',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'left',
-          backgroundColor: 'white',
-          borderRadius: '30px',
-          fontWeight: 'bold',
-          fontSize: '3vh',
-          width: '69.6vw',
-          right: '22vw',
-          zIndex: '103',
-          padding: '1%',
-        }}>
+        <i.AnimatedDiv isHidden={isFirstModalOpen}>
           {modalFirstContent.texts[0]}
-        </div>
+        </i.AnimatedDiv>
       :
       <div></div>
       }

@@ -13,11 +13,26 @@ const index = (props: { image: string; texts:string[] }) => {
 
   return (
     <i.Container>
-      {image !== '' ?
+      {image.includes('connecting') ?
+        <i.connectingImage key={image} imageUrl={image}/> :
+      texts.length === 1 ? 
+      <i.CheckContainer>
+        <i.CheckMark viewBox="0 0 24 24">
+          <path d="M4 12l6 6L20 6" />
+        </i.CheckMark>
+      </i.CheckContainer> :
+      image !== ''  ? 
         <i.image key={image} imageUrl={image}/> :
-        null
+      null
       }
-      {image !== '' ?
+      {image.includes('connect') || texts.length === 1 ?
+        <i.connectingTextWrap>
+          <i.connectingText>{texts[0]}</i.connectingText>
+          <i.connectingTextDot className="dot1">{texts[1]}</i.connectingTextDot>
+          <i.connectingTextDot className="dot2">{texts[1]}</i.connectingTextDot>
+          <i.connectingTextDot className="dot3">{texts[1]}</i.connectingTextDot>
+        </i.connectingTextWrap> :
+      image !== '' ?
         <i.TextWrapper key={image}>
           <i.Text1>{texts[0]}</i.Text1>
           <i.TextWrapper2 key={image}>

@@ -2,8 +2,7 @@ import InterviewFooter from '@/components/interview/InterviewFooter'
 import InterviewSection from '@/components/interview/InterviewSection'
 import InterviewHeader from '@/components/interview/InterviewHeader'
 import * as i from '@pages/interview/InterviewPage.styled'
-import { useState } from 'react'
-import { Outlet } from 'react-router'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 
@@ -21,12 +20,23 @@ const InterviewPage = () => {
   }
 
   const handleNextPage = () => {
-    if (currentPage < 3) setCurrentPage(currentPage + 1)
+    if (currentPage < 5) setCurrentPage(currentPage + 1)
   }
 
   const StartInterview = () => {
     navigate('/interviewing', { state: { interviewId: interviewId } })
   }
+
+  // useEffect for auto-advance from page 4 to 5 after 5 seconds
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (currentPage === 4) {
+      timer = setTimeout(() => {
+        setCurrentPage(5);
+      }, 1000); // 5 seconds delay
+    }
+    return () => clearTimeout(timer); // Clear the timer on cleanup
+  }, [currentPage]);
 
   return (
     <i.Container>
@@ -49,6 +59,7 @@ const InterviewPage = () => {
           '정확한 발음과 적절한 목소리로',
           '면접을 진행해주세요.'
         ]}/> :
+      currentPage === 3 ?
       <InterviewSection
         key={currentPage}
         image=''
@@ -56,14 +67,29 @@ const InterviewPage = () => {
           '질문은 총', '7개', '로 구성되며',
           '생각 시간은', '30초', '대답시간은', '60초', '입니다.',
           '면접은 약', '10분', '간 진행될 예정입니다.'
-        ]}/> 
+        ]}/> :
+      currentPage === 4 ?
+      <InterviewSection
+        key={currentPage}
+        image='public/images/connecting.png'
+        texts={[
+          '면접관을 연결중입니다', '.'
+        ]}/> :
+      <InterviewSection
+        key={currentPage}
+        image=''
+        texts={[
+          '면접관이 연결되었습니다 !',
+        ]}/>
       }
       <InterviewFooter />
       <i.WrapButton>
         {currentPage !== 1 ?
           <FullButton text='이전으로' onClick={handlePrevPage} disabled/> :
           <div></div>}
-        {currentPage !== 3 ?
+        {currentPage === 4 ? 
+        <div></div>:
+        currentPage !== 5 ?
           <FullButton text='다음으로' onClick={handleNextPage} disabled/> :
           <FullButton text='시작하기' onClick={StartInterview} disabled/>}
       </i.WrapButton>

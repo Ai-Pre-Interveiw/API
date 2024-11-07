@@ -57,7 +57,7 @@ export const Menu = styled.div`
 `
 
 export const Menu1 = styled.div`
-  margin-left: 3vw;
+  margin-left: 0.1vw;
 `
 
 export const Menu2 = styled.div`

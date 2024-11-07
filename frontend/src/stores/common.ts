@@ -16,3 +16,8 @@ export const currentNavState = atom<navType>({
   },
   effects_UNSTABLE: [persistAtom],
 })
+
+export const countState = atom({
+  key: 'countState', // 각 상태마다 고유한 key를 설정해야 합니다.
+  default: 0,
+});

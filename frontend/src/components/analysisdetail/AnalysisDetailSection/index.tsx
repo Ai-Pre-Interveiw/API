@@ -22,7 +22,7 @@ interface InterviewResult {
   created_at: string,
   updated_at: string,
   interview: number,
-  question: number
+  question: {content: string};
 }
 
 interface AnalysisDetailSectionProps {
@@ -44,7 +44,7 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
     const loadInterviews = async () => {
       try {
         const interviewResultData = await getInterviewResult(parseInt(id!, 10));
-        setInterviewResults(interviewResultData);
+        setInterviewResults(interviewResultData.slice(1));
       } catch (error) {
         console.error("면접을 불러오는 중 오류가 발생했습니다:", error);
       }
@@ -53,7 +53,7 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
   }, []);
 
   useEffect(() => {
-    console.log(interviewResults)
+    // console.log(interviewResults)
   }, [interviewResults]);
 
   return (
@@ -62,7 +62,17 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
     <a.Container>
       <a.Title>분석 결과</a.Title>
       <a.SecondTitle>{user.nickname} 님의</a.SecondTitle>
-      <a.ThirdTitle>{interviewResults[0].updated_at} 진행한 모의면접 분석결과 입니다.</a.ThirdTitle>
+      <a.ThirdTitle>
+        {new Intl.DateTimeFormat('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true, // 오후/오전 표시
+          timeZone: 'Asia/Seoul' // 한국 시간대 설정
+        }).format(new Date(interviewResults[0].updated_at))} 진행한 모의면접 분석결과 입니다.
+      </a.ThirdTitle>
       
       <a.AllWrap>
         <a.MenuWrap>
@@ -87,17 +97,11 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
         </a.MenuWrap>
         
         {/* 기본적으로 종합분석이 선택된 상태로 표시 */}
-        <AnalysisDetailQuestion selectedIndex={selectedIndex} />
+        <AnalysisDetailQuestion 
+          selectedIndex={selectedIndex} 
+          data={selectedIndex === -1 ? interviewResults : interviewResults[selectedIndex]}
+        />
       </a.AllWrap>
-
-      {selectedIndex !== null && selectedIndex !== -1 && (
-        <a.DetailWrap>
-          <p>파일 경로: {interviewResults[selectedIndex].video_path}</p>
-          <p>업로드 시간: {interviewResults[selectedIndex].created_at}</p>
-        </a.DetailWrap>
-      )}
-
-      <FullButton text="뒤로 가기" onClick={() => navigate('/analysis')} disabled />
     </a.Container>
     : <div></div>}
     </>

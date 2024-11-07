@@ -112,6 +112,126 @@ export const TextWrapper4 = styled.div`
   animation: ${fadeIn} 0.8s ease-out;
 `
 
+// 회전 애니메이션 정의
+const rotate = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+`;
+
+export const connectingImage = styled.div<{ imageUrl: string }>`
+  width: 20%;
+  height: 50%;
+  background-image: url(${(props) => props.imageUrl}); /* 이미지 경로 설정 */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: ${rotate} 1.5s ease-in-out infinite; /* 애니메이션 적용 */
+  position: relative;
+  margin-top: 1%;
+`
+
+const fadeDots = keyframes`
+  0%, 20% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+`;
+
+export const connectingTextWrap = styled.div`
+  margin-left: 5vw;
+  display: flex;
+  flex-direction: row;
+  // background-color: yellow;
+
+  span {
+  animation: ${fadeDots} 1.5s infinite;
+  }
+
+  .dot1 {
+    animation-delay: 0.1s;
+  }
+  
+  .dot2 {
+    animation-delay: 0.2s;
+  }
+
+  .dot3 {
+    animation-delay: 0.3s;
+  }
+`
+
+export const connectingText = styled.div`
+  margin-left: 0.3vw;
+  font-size: 4vh;
+  font-weight: bold;
+  // background-color: blue;
+`
+
+export const connectingTextDot = styled.span`
+  margin-left: 0.3vw;
+  font-size: 4vh;
+  font-weight: bold;
+`
+
+const fadeInCheck = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+const drawCheck = keyframes`
+  0% {
+    stroke-dashoffset: 30;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+`;
+
+export const CheckContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ${fadeInCheck} 1s ease forwards;
+  // background-color: yellow;
+  width: 18vw;
+`;
+
+export const CheckMark = styled.svg`
+  width: 50vw;
+  height: 40vh;
+  stroke: #4caf50;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: ${drawCheck} 1s ease forwards;
+`;
+
 
 // 작은 이미지 스타일
 // export const SmallImageUpLeft = styled.div`
