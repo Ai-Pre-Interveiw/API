@@ -10,6 +10,14 @@ export const Container = styled.div`
   padding-left: 1%;
   padding-right: 1%;
   overflow: hidden;
+  overflow-y: auto; /* 스크롤 가능하게 설정 */
+  // &::-webkit-scrollbar {
+  //   display: none; /* 크롬, 사파리, 오페라, 엣지 */
+  //   width: 0; /* Remove scrollbar space */
+  //   height: 0;
+  //   background: transparent; /* Optional: just make scrollbar invisible */
+  //   -webkit-appearance: none;
+  // }
   // justify-content: center;
   // align-items: center;
   // row-gap: 5%;

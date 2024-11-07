@@ -1,9 +1,10 @@
 import * as m from '@/common/Modal/Modal.styled';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ModalType } from '@/types/commonType';
 import FullButton from '@common/Fullbutton/index';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
+import { countState } from '@/stores/common';
 import { userState } from '@stores/user';
 import { uploadResume } from '@/apis/resume';
 import { getResume } from '@/apis/resume';
@@ -16,6 +17,13 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
   const navigate = useNavigate();
   const [resumes, setResumes] = useState<{ id: number; filePath: string; uploadTime: string }[]>([]);
   const job_field = ['AI', '마케팅', '직무분야1', '직무분야2']
+  const [count, setCount] = useRecoilState(countState); // count 상태와 setter 함수 불러오기
+
+  useEffect(() => {
+    if (name.startsWith('질문 생각')) {
+      setCount((prevCount) => prevCount + 1); // count 값을 증가시킴
+    }
+  }, [name, setCount]); // name이 변경될 때마다 실행
 
   if (name === '모의면접') {
     useEffect(() => {
@@ -203,7 +211,6 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
             </m.InterviewTextWrap> :
           name.includes('생각') ?
             <m.ThinkButtonWrap>
-              <FullButton text={`${countdown}초 남음`} onClick={() => {}} disabled={countdown === 0} />
               <FullButton text="답변하기" onClick={onClose} disabled/>
             </m.ThinkButtonWrap> :
           name.includes('진행') ?
@@ -213,6 +220,45 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
             </m.FinishContent> :
           <div></div>
           }
+          {name.includes('질문') ? 
+            <div style={{
+              position: 'absolute',
+              right: '5vw',
+              top: '5vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: countdown <= 10 ? 'red' : 'white',
+              height: '6vh',
+              width: '6.8vw',
+              borderRadius: '30px',
+              fontWeight: 'bold',
+              fontSize: '2vh',
+              color: countdown <= 10 ? 'white' : 'black'
+            }}>
+              {countdown}초
+            </div>
+          : <div></div>}
+          
+          {name.includes('질문') ? 
+            <div style={{
+              position: 'absolute',
+              left: '5vw',
+              top: '5vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'white',
+              height: '6vh',
+              width: '6.8vw',
+              borderRadius: '30px',
+              fontWeight: 'bold',
+              fontSize: '2vh',
+            }}>
+              {count} / 7
+            </div>
+          : <div></div>}
+
           {!name.includes('질문') && (
             <m.Backdrop>
               <img src="/images/x.png" alt="" onClick={onClose} style={{ width: '3vh', height: 'auto' }} />

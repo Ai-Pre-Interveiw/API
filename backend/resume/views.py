@@ -87,6 +87,7 @@ def create_interview_result(request):
     if serializer.is_valid():
         serializer.save()  # 유효한 데이터로 저장
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    print(serializer.errors)  # 오류 메시지를 로그에 출력
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 면접 결과 수정

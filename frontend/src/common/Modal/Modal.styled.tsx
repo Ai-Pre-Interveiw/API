@@ -192,17 +192,17 @@ export const ThinkWrap = styled.div`
 
 export const ThinkButtonWrap = styled.div`
   position: absolute;
-  right: 8.5vw;
-  bottom: 2vh;
+  right: 5vw;
+  bottom: 10vh;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 1vw;
-  width: 13vw;
-  background-color: white;
-  height: 6vh;
-  border-radius: 30px;
+  // gap: 1vw;
+  // width: 6.8vw;
+  // background-color: white;
+  // height: 6vh;
+  // border-radius: 30px;
   font-weight: bold;
   font-size: 3vh;
 `
