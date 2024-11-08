@@ -51,6 +51,18 @@ def get_all_interviews(request):
     serializer = InterviewSerializer(interviews, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+# 특정 면접 조회
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_specific_interview(request, interview_id):
+    try:
+        interview = Interview.objects.get(id=interview_id, resume__user=request.user)
+    except Interview.DoesNotExist:
+        return Response({"error": "Interview not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = InterviewSerializer(interview)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # 기본 질문 리스트 설정
 DEFAULT_QUESTIONS = [

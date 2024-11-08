@@ -112,16 +112,16 @@ export const TextWrapper4 = styled.div`
   animation: ${fadeIn} 0.8s ease-out;
 `
 
-// 회전 애니메이션 정의
-const rotate = keyframes`
+// 위아래 둥둥 뜨는 애니메이션 정의
+const floatUpDown = keyframes`
   0% {
-    transform: rotate(0deg);
+    transform: translateY(0);
   }
   50% {
-    transform: rotate(10deg);
+    transform: translateY(-15px); /* 위로 이동하는 거리 설정 */
   }
   100% {
-    transform: rotate(0deg);
+    transform: translateY(0);
   }
 `;
 
@@ -132,10 +132,10 @@ export const connectingImage = styled.div<{ imageUrl: string }>`
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  animation: ${rotate} 1.5s ease-in-out infinite; /* 애니메이션 적용 */
+  animation: ${floatUpDown} 2s ease-in-out infinite; /* 둥둥 떠오르는 애니메이션 적용 */
   position: relative;
   margin-top: 1%;
-`
+`;
 
 const fadeDots = keyframes`
   0%, 20% {
@@ -191,46 +191,33 @@ export const connectingTextDot = styled.span`
   font-weight: bold;
 `
 
-const fadeInCheck = keyframes`
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-`;
-
-const drawCheck = keyframes`
+// 체크 표시 애니메이션 정의
+const checkMarkAnimation = keyframes`
   0% {
-    stroke-dashoffset: 30;
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
   }
   100% {
-    stroke-dashoffset: 0;
+    transform: scale(1);
+    opacity: 1;
   }
 `;
 
-export const CheckContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: ${fadeInCheck} 1s ease forwards;
-  // background-color: yellow;
-  width: 18vw;
-`;
-
-export const CheckMark = styled.svg`
-  width: 50vw;
-  height: 40vh;
-  stroke: #4caf50;
-  stroke-width: 2;
-  fill: none;
-  stroke-linecap: round;
-  stroke-dasharray: 30;
-  stroke-dashoffset: 30;
-  animation: ${drawCheck} 1s ease forwards;
-`;
+export const checkImage = styled.div<{ imageUrl: string }>`
+  width: 20%;
+  height: 50%;
+  background-image: url(${(props) => props.imageUrl}); /* 이미지 경로 설정 */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  margin-top: 1%;
+  animation: ${checkMarkAnimation} 0.8s ease-out; /* 체크 애니메이션 적용 */
+`
 
 
 // 작은 이미지 스타일
