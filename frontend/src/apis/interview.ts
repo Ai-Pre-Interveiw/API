@@ -38,6 +38,25 @@ export const getAllInterviews = async () => {
   }
 };
 
+export const getInterviewDetails = async (interviewId : number) => {
+  try {
+    const csrfToken = await getCsrfToken(); // CSRF 토큰을 가져오는 함수가 있다고 가정
+    const response = await axios.get(
+      `${BASE_URL}/resume/interviews/${interviewId}/`,
+      {
+        headers: {
+          'X-CSRFToken': csrfToken, // CSRF 토큰 포함
+        },
+        withCredentials: true, // 인증 쿠키가 필요한 경우 설정
+      }
+    );
+    return response.data;  // 응답 데이터를 반환
+  } catch (error) {
+    console.error("Failed to fetch interview details:", error);
+    throw error;  // 오류를 발생시켜 호출한 곳에서 처리할 수 있게 함
+  }
+};
+
 // Interview 생성 요청 함수
 export const createInterview = async (data: CreateInterviewData) => {
   try {
@@ -79,6 +98,7 @@ export const getInterviewQuestions = async (interviewId: number) => {
 
 // InterviewResult 생성 요청 함수
 export const createInterviewResult = async (data: FormData) => {
+
   try {
     const csrfToken = await getCsrfToken(); // CSRF 토큰을 가져오는 함수가 있다고 가정
     const response = await axios.post(

@@ -16,11 +16,7 @@ const index = (props: { image: string; texts:string[] }) => {
       {image.includes('connecting') ?
         <i.connectingImage key={image} imageUrl={image}/> :
       texts.length === 1 ? 
-      <i.CheckContainer>
-        <i.CheckMark viewBox="0 0 24 24">
-          <path d="M4 12l6 6L20 6" />
-        </i.CheckMark>
-      </i.CheckContainer> :
+        <i.checkImage key={image} imageUrl={image}/> :
       image !== ''  ? 
         <i.image key={image} imageUrl={image}/> :
       null

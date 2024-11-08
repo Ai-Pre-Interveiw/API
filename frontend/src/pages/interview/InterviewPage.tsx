@@ -33,7 +33,7 @@ const InterviewPage = () => {
     if (currentPage === 4) {
       timer = setTimeout(() => {
         setCurrentPage(5);
-      }, 1000); // 5 seconds delay
+      }, 5000); // 5 seconds delay
     }
     return () => clearTimeout(timer); // Clear the timer on cleanup
   }, [currentPage]);
@@ -44,7 +44,7 @@ const InterviewPage = () => {
       {currentPage === 1 ?
         <InterviewSection
           key={currentPage}
-          image='src/assets/images/interview1.png'
+          image='/images/interview1.png'
           texts={[
             '실전 면접에',
             '임한다는 마음가짐으로',
@@ -53,7 +53,7 @@ const InterviewPage = () => {
       currentPage === 2 ?
       <InterviewSection
         key={currentPage}
-        image='src/assets/images/interview2.png'
+        image='/images/interview2.png'
         texts={[
           '정확한 결과분석을 위해',
           '정확한 발음과 적절한 목소리로',
@@ -71,13 +71,13 @@ const InterviewPage = () => {
       currentPage === 4 ?
       <InterviewSection
         key={currentPage}
-        image='public/images/connecting.png'
+        image='/images/connecting.png'
         texts={[
           '면접관을 연결중입니다', '.'
         ]}/> :
       <InterviewSection
         key={currentPage}
-        image=''
+        image='/images/check.png'
         texts={[
           '면접관이 연결되었습니다 !',
         ]}/>
