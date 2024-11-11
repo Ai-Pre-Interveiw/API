@@ -9,7 +9,7 @@
 mp_final
 
 db.sqlite3
-.pyc
+*.pyc
 *.pdf
 *.mp4
 *.png

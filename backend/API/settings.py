@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'accounts',
     'resume',
     'corsheaders',
+    'ai_infer',
     'rest_framework',
     'rest_framework.authtoken',
     "django.contrib.admin",

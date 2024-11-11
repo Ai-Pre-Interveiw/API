@@ -5,7 +5,11 @@ import FullButton from '@/common/Fullbutton'
 import { useNavigate, useLocation  } from 'react-router-dom'
 import { useSetRecoilState } from 'recoil';
 import { userState } from '@stores/user';
-import { getInterviewQuestions, createInterviewResult, getInterviewDetails } from '@/apis/interview'
+import { getInterviewQuestions,
+        createInterviewResult,
+        getInterviewDetails,
+        inferenceEyePose,
+       } from '@/apis/interview'
 import * as i from '@pages/interview/Interviewing.styled'
 import InterviewFooter from '@/components/interview/InterviewFooter'
 
@@ -170,7 +174,7 @@ const Interviewing = () => {
         : (((interviewId - 1) * 8) + currentQuestionIndex).toString();
   
       formData.append('question', questionId);
-      formData.append('video_path', blob, `recorded_video_${new Date().toISOString()}.mp4`);
+      formData.append('video_path', blob, `recorded_video_${new Date().toISOString()}_${questionId}.mp4`);
   
       try {
         const response = await createInterviewResult(formData);
@@ -316,6 +320,7 @@ const Interviewing = () => {
       setIsThinking(false);
     } else {
       alert('모든 질문이 완료되었습니다.');
+      alert('분석결과 페이지에서 분석하기 버튼을 눌러주세요.');
       navigate('/')
     }
   };

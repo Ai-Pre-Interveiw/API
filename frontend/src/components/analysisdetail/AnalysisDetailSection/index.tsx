@@ -22,7 +22,7 @@ interface InterviewResult {
   created_at: string,
   updated_at: string,
   interview: number,
-  question: {content: string};
+  question_detail: {content: string};
 }
 
 interface AnalysisDetailSectionProps {
@@ -97,9 +97,9 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
         </a.MenuWrap>
         
         {/* 기본적으로 종합분석이 선택된 상태로 표시 */}
-        <AnalysisDetailQuestion 
-          selectedIndex={selectedIndex} 
-          data={selectedIndex === -1 ? interviewResults : interviewResults[selectedIndex]}
+        <AnalysisDetailQuestion
+          selectedIndex={selectedIndex}
+          data={selectedIndex === -1 ? interviewResults : [interviewResults[selectedIndex]]}
         />
       </a.AllWrap>
     </a.Container>

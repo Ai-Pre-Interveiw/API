@@ -91,6 +91,23 @@ def create_interview(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_interview(request, interview_id):
+    try:
+        # 인터뷰 객체 찾기
+        interview = Interview.objects.get(id=interview_id)
+    except Interview.DoesNotExist:
+        return Response({"error": "Interview not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # 요청 데이터로 인터뷰 업데이트
+    serializer = InterviewSerializer(interview, data=request.data, partial=True)  # 부분 업데이트 허용
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 # 면접 결과 생성
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

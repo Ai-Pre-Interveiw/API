@@ -230,7 +230,7 @@ export const FinishContent = styled.div`
 export const StyledDropdown = styled(Dropdown)`
   width: 100%;
   max-width: 20vw;
-  font-size: 16px;
+  font-size: 2vh;
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fff;
@@ -248,7 +248,7 @@ export const StyledDropdown = styled(Dropdown)`
 
   .Dropdown-placeholder {
     color: #888;
-    font-size: 1.7vh;
+    font-size: 2vh;
   }
 
   .Dropdown-menu {
@@ -314,10 +314,10 @@ export const labelWrap = styled.div`
 `;
 
 export const NoOptionsMessage = styled.div`
-  padding: 1vh;
+  padding: 0.6vh;
   color: #888;
   text-align: left;
-  font-size: 1.7vh;
+  font-size: 2vh;
   background-color: #f7f7f7;
   border: 1px solid #ccc;
   border-radius: 8px;

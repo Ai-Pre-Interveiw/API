@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from Pose_Eye_mp_Final import mp_pose_eye_infer
-from emotion_4_class_recognition import face_recognition
-from voice_algolithm import extract_audio_from_video, VocalTremorAnalyzer, plot_tension_distribution
-
+from ai_infer.Pose_Eye_mp_Final import mp_pose_eye_infer
+from ai_infer.emotion_4_class_recognition import face_recognition
+from ai_infer.voice_algolithm import extract_audio_from_video, VocalTremorAnalyzer, plot_tension_distribution_entropy, plot_tension_distribution_line
+from django.core.files import File
+from resume.models import InterviewResult, Interview, Question
 import numpy as np
 import librosa
 import scipy.signal
@@ -11,45 +12,207 @@ from scipy.stats import entropy
 import pandas as pd
 import moviepy.editor as mvp
 import os
+import time
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.core.files.storage import default_storage
+from django.conf import settings
 
+# def inference_eye_pose(request):
+#     video_folder = '../media/interview_video_test/'
+#     for video_file in os.listdir(video_folder):
+#         if video_file.endswith(('.mp4', '.avi', 'webm')):
+#             video_path = f'{video_folder}/{video_file}'
+#             eye_graph_image_path, pose_graph_image_path = mp_pose_eye_infer(video_path)
 
-def process_all_videos():
-    video_folder = 'C:/Users/USER/Desktop/API/API/backend/media/interview_video_test'
-    compare_folder = 'C:/Users/USER/Desktop/API/API/backend/media/graph/gaze'
-    wav_folder = 'C:/Users/USER/Desktop/API/API/backend/media/interview_wavs'
-    wav_plt_folder = 'C:/Users/USER/Desktop/API/API/backend/media/graph/voice'
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def inference_eye_pose(request, interview_id):
+    video_folder = f'C:/Users/USER/Desktop/pjt/API/backend/media/interview_videos/{interview_id}'  # 특정 인터뷰 ID 폴더 경로
+    wav_folder = f'C:/Users/USER/Desktop/pjt/API/backend/media/interview_wavs/{interview_id}'
+    anxiety_folder = 'C:/Users/USER/Desktop/pjt/API/backend/media/graph/anxiety'
+    voice_plt_folder = 'C:/Users/USER/Desktop/pjt/API/backend/media/graph/voice'
     processed_videos = []
 
-    # 비디오 폴더 내 모든 파일에 대해 처리
-    for video_file in os.listdir(video_folder):
-        if video_file.endswith(('.mp4', '.avi', '.webm')):  # 필요한 파일 확장자 필터링
-            video_path = f"{video_folder}/{video_file}"
-            compare_path = f"{compare_folder}/{video_file}"
+    print(f"Looking for videos in folder: {video_folder}")
 
-            # 결과 폴더에 같은 이름의 파일이 있는지 확인
-            if not os.path.exists(compare_path):  # 파일이 없을 경우에만 처리
+    # 해당 인터뷰 ID 폴더 내의 파일을 처리
+    if os.path.isdir(video_folder):  # 폴더가 존재하는지 확인
+        for video_file in os.listdir(video_folder):
+            print(video_file)
+            if video_file.endswith(('.mp4', '.avi', '.webm')):
+                # print(f'비디오 파일이요 : {video_file}')  # 필요한 파일 확장자 필터링
+                # video_path = os.path.join(video_folder, video_file)
+                video_path = video_folder + '/' + video_file
+                # print(f'비디오 경로요 : {video_path}')
+                
+                try:
+                    # 파일명에서 질문 ID를 추출
+                    file_name_parts = video_file.split('_')[-1]
+                    question_id = int(file_name_parts.split('.')[0])  # 질문 ID 추출
+
+                    # InterviewResult 객체 찾기
+                    interview = Interview.objects.get(id=interview_id)
+                    question = Question.objects.get(id=question_id)
+                    interview_result = InterviewResult.objects.get(interview=interview, question=question)
+
+                    # mp_pose_eye_infer 함수로 그래프 이미지 경로 생성
+                    eye_graph_path, pose_graph_path, eye_graph_image_path, pose_graph_image_path = mp_pose_eye_infer(video_path)
+                    print(f'여기인가 {eye_graph_path}')
+                    print(f'아님여기 {eye_graph_image_path}')
+                    # # 파일 생성 대기 루프 (최대 10초 대기)
+                    # max_wait_time = 10  # 최대 대기 시간(초)
+                    # wait_interval = 0.5  # 확인 주기(초)
+                    # elapsed_time = 0
+
+                    # while (not os.path.exists(eye_graph_path) or not os.path.exists(pose_graph_path)) and elapsed_time < max_wait_time:
+                    #     time.sleep(wait_interval)
+                    #     elapsed_time += wait_interval
+                    #     print(elapsed_time)
+                    #     # print(f"Waiting for files: {eye_graph_path} and {pose_graph_path}")
+
+                    # 파일이 생성된 경우에만 업데이트
+                    if os.path.exists(eye_graph_path) and os.path.exists(pose_graph_path):
+                        
+                        # FileField에 경로만 할당
+                        interview_result.gaze_distribution_path = eye_graph_image_path
+                        interview_result.posture_distribution_path = pose_graph_image_path
+
+                        # 모델 저장
+                        interview_result.save()
+                        
+                        # with open(eye_graph_path, 'rb') as eye_graph_image_file, open(pose_graph_path, 'rb') as pose_graph_image_file:
+                        #     interview_result.gaze_distribution_path.save(
+                        #         os.path.basename(eye_graph_image_path), File(eye_graph_image_file), save=True
+                        #     )
+                        #     print(f"Saved gaze_distribution_path: {interview_result.gaze_distribution_path}")
+
+                        #     interview_result.posture_distribution_path.save(
+                        #         os.path.basename(pose_graph_image_path), File(pose_graph_image_file), save=True
+                        #     )
+                        #     print(f"Saved posture_distribution_path: {interview_result.posture_distribution_path}")
+
+                    else:
+                        print(f"Timeout: Unable to find {eye_graph_path} or {pose_graph_path} after waiting.")
+
+                except (Interview.DoesNotExist, Question.DoesNotExist, InterviewResult.DoesNotExist) as e:
+                    print(f"Error processing {video_file}: {str(e)}")
+                    continue
+
                 extract_audio_from_video(video_path, wav_folder)
-                mp_pose_eye_infer(video_path)
-                processed_videos.append(video_file)  # 처리된 파일 이름 저장
+                print('일단 wav는 나오고')
 
     # 음성 감정 분석
     voice_emotion = VocalTremorAnalyzer()
     for idx, wav_file in enumerate(os.listdir(wav_folder)):
-        # 단일 wav 파일을 analyze_wav_files에 리스트 형태로 전달
         wav_path = f"{wav_folder}/{wav_file}"
-        voice_result = voice_emotion.analyze_wav_files([wav_path])  # wav_path를 리스트로 형 변환 
+        
+        # `analyze_wav_files`의 첫 번째 결과를 가져와 각 메트릭 값을 추출
+        voice_result = voice_emotion.analyze_wav_files([wav_path])
+        
+        # voice_result에서 각 메트릭 추출
 
-        # voice_result에서 필요한 메트릭 값 추출 
-        freq_std = voice_result.get('freq_std')
-        freq_variation = voice_result.get('freq_variation')
-        modulation_index = voice_result.get('modulation_index')
-        entropy_std = voice_result.get('entropy_std')
-        entropy_rate = voice_result.get('entropy_rate')
+        freq_std = voice_result['freq_std']
+        # freq_variation = voice_result['freq_variation']
+        # modulation_index = voice_result['modulation_index']
+        # entropy_std = voice_result['entropy_std']
+        entropy_rate = voice_result['entropy_rate']
 
-        # plot_custom_distribution 호출
-        metrics = [freq_std, freq_variation, modulation_index, entropy_std, entropy_rate]
-        metric_names = ["Frequency Std", "Frequency Variation", "Modulation Index", "Entropy Std", "Entropy Rate"]
-        plot_tension_distribution(metrics, metric_names, output_folder=wav_plt_folder, video=processed_videos[idx])
+
+        # 각 메트릭에 대해 그래프 생성
+        # metrics = [freq_std, freq_variation, modulation_index, entropy_std, entropy_rate]
+        # metric_names = ["Frequency Std", "Frequency Variation", "Modulation Index", "Entropy Std", "Entropy Rate"]
+        line_metrics = [freq_std]
+        line_metric_names = ['Frequency Std']
+        ent_rate_metrics = [entropy_rate]
+        ent_rate_metrics_names = ['Entropy Rate']
+        # plot_tension_distribution(metrics, metric_names, output_folder=wav_plt_folder, video=wav_file)
+        anxiety_graph_output_path, anxiety_graph_path = plot_tension_distribution_line(line_metrics, line_metric_names, output_folder=anxiety_folder, video=wav_file)
+        voice_graph_output_path, voice_graph_path = plot_tension_distribution_entropy(ent_rate_metrics, ent_rate_metrics_names, output_folder=voice_plt_folder, video=wav_file)
+        try:
+            # 파일명에서 질문 ID를 추출
+            file_name_parts = wav_file.split('_')[-1]
+            question_id = int(file_name_parts.split('.')[0])  # 질문 ID 추출
+
+            # InterviewResult 객체 찾기
+            interview = Interview.objects.get(id=interview_id)
+            question = Question.objects.get(id=question_id)
+            interview_result = InterviewResult.objects.get(interview=interview, question=question)
+
+            # 파일이 생성된 경우에만 업데이트
+            if os.path.exists(anxiety_graph_output_path) and os.path.exists(voice_graph_output_path):
+                print('여기')
+                # FileField에 경로만 할당
+                interview_result.anxiety_graph_path = anxiety_graph_path
+                interview_result.voice_distribution_path = voice_graph_path
+
+            # 모델 저장
+            interview_result.save()
+
+            processed_videos.append(video_file)
+
+            # with open(voice_graph_output_path, 'rb') as voice_graph_image_file, open(voice_ent_graph_output_path, 'rb') as voice_ent_graph_image_flie:
+            #     interview_result.voice_distribution_path.save(
+            #         os.path.basename(voice_graph_path), File(voice_graph_image_file), save=True
+            #     )
+            #     print(f"Saved voice_distribution_path: {interview_result.voice_distribution_path}")
+            #     interview_result.voice_ent_distribution_path.save(
+            #         os.path.basename(voice_ent_graph_path), File(voice_ent_graph_image_flie), save=True
+            #     )
+            #     print(f"Saved voice_ent_distribution_path: {interview_result.voice_ent_distribution_path}")
+
+        except (Interview.DoesNotExist, Question.DoesNotExist, InterviewResult.DoesNotExist) as e:
+            print('파일 저장 안된다고~~~~')
+            print(f"Error processing {video_file}: {str(e)}")
+            continue
+
+
+    return JsonResponse({"processed_videos": processed_videos}, status=200)
+
+# def process_all_videos():
+#     video_folder = 'C:/Users/USER/Desktop/API/API/backend/media/interview_video_test'
+#     compare_folder = 'C:/Users/USER/Desktop/API/API/backend/media/graph/gaze'
+#     wav_folder = 'C:/Users/USER/Desktop/API/API/backend/media/interview_wavs'
+#     wav_plt_folder = 'C:/Users/USER/Desktop/API/API/backend/media/graph/voice'
+#     processed_videos = []
+
+#     # # 비디오 폴더 내 모든 파일에 대해 처리
+#     # for video_file in os.listdir(video_folder):
+#     #     if video_file.endswith(('.mp4', '.avi', '.webm')):  # 필요한 파일 확장자 필터링
+#     #         video_path = f"{video_folder}/{video_file}"
+#     #         compare_path = f"{compare_folder}/{video_file}"
+
+#     #         # 결과 폴더에 같은 이름의 파일이 있는지 확인
+#     #         if not os.path.exists(compare_path):  # 파일이 없을 경우에만 처리
+#     #             extract_audio_from_video(video_path, wav_folder)
+#     #             mp_pose_eye_infer(video_path)
+#     #             processed_videos.append(video_file)  # 처리된 파일 이름 저장
+
+#     # 음성 감정 분석
+#     voice_emotion = VocalTremorAnalyzer()
+#     for idx, wav_file in enumerate(os.listdir(wav_folder)):
+#         wav_path = f"{wav_folder}/{wav_file}"
+        
+#         # `analyze_wav_files`의 첫 번째 결과를 가져와 각 메트릭 값을 추출
+#         voice_result = voice_emotion.analyze_wav_files([wav_path])
+        
+#         # voice_result에서 각 메트릭 추출
+
+#         freq_std = voice_result['freq_std']
+#         freq_variation = voice_result['freq_variation']
+#         modulation_index = voice_result['modulation_index']
+#         entropy_std = voice_result['entropy_std']
+#         entropy_rate = voice_result['entropy_rate']
+
+        
+
+#         # 각 메트릭에 대해 그래프 생성
+#         metrics = [freq_std, freq_variation, modulation_index, entropy_std, entropy_rate]
+#         metric_names = ["Frequency Std", "Frequency Variation", "Modulation Index", "Entropy Std", "Entropy Rate"]
+#         line_metrics = [freq_std]
+#         line_metric_names = ['Frequency Std']
+#         plot_tension_distribution(metrics, metric_names, output_folder=wav_plt_folder, video=wav_file)
+#         plot_tension_distribution_line(line_metrics, line_metric_names, output_folder=wav_plt_folder, video=wav_file)
 
     # return JsonResponse({
     #     'message': 'Processing completed.',
@@ -57,4 +220,6 @@ def process_all_videos():
     # })
 
 
-process_all_videos()
+# process_all_videos()
+
+

@@ -34,7 +34,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
-        fields = ['id', 'resume', 'scheduled_start', 'position', 'experience_level']  # 면접 생성에 필요한 필드들
+        fields = ['id', 'resume', 'scheduled_start', 'position', 'experience_level', 'isProcessing', 'isProcessed']  # 면접 생성에 필요한 필드들
 
 class InterviewResultSerializer(serializers.ModelSerializer):
     question = serializers.PrimaryKeyRelatedField(queryset=Question.objects.all())  # question ID만 포함

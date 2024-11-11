@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { userState } from '@/stores/user'
 import { useRecoilValue } from 'recoil'
 import { useState } from 'react'
+import FullButton from '@common/Fullbutton/index'
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // AnalysisDetailSection.tsx
 export interface InterviewResult {
@@ -28,16 +31,38 @@ interface AnalysisDetailQuestionProps {
 }
 
 const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selectedIndex, data }) => {
-
   const [isOpen, setIsOpen] = useState(false);
 
-  const videoPath = !Array.isArray(data) ? data.video_path : null;
-  const questionContent = !Array.isArray(data) ? data.question_detail.content : null;
-  
-  console.log(data)
-  
+  // `data`가 배열이고 요소가 있는지 확인
+  const videoPath = Array.isArray(data) && data.length > 0 ? data[0].video_path : null;
+  const questionContent = Array.isArray(data) && data.length > 0 ? data[0].question_detail.content : null;
+  const gazeGraphPath = Array.isArray(data) && data.length > 0 ? data[0].gaze_distribution_path : null;
+  const poseGraphPath = Array.isArray(data) && data.length > 0 ? data[0].posture_distribution_path : null;
+  const anxietyGraphPath = Array.isArray(data) && data.length > 0 ? data[0].anxiety_graph_path : null;
+  const voiceGraphPath = Array.isArray(data) && data.length > 0 ? data[0].voice_distribution_path : null;
+
+  console.log(data);
+  console.log(anxietyGraphPath)
+  console.log(voiceGraphPath)
+
+  // PDF 다운로드 함수
+  const downloadPDF = async () => {
+    const element = document.getElementById('pdf-content'); // PDF로 변환할 요소 선택
+    if (element) {
+      const canvas = await html2canvas(element);
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('interview_analysis.pdf');
+    }
+  };
+
   return (
     <a.Container>
+      {/* <FullButton text="PDF 다운로드" onClick={downloadPDF} disabled/> */}
+      <div id='pdf-content'>
       {selectedIndex === -1 ? (
         <div>
           <p>종합 분석</p>
@@ -55,8 +80,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
                 src={`${BASE_URL}${videoPath}`} // BASE_URL과 video_path를 조합하여 동영상 URL 생성
                 controls // 동영상 컨트롤 표시
               />
-              <a.nervousGraph>
-                긴장도그래프
+              <a.nervousGraph imageUrl={`${BASE_URL}${anxietyGraphPath}`}>
               </a.nervousGraph>
           </a.videoGraphWrap>
           <a.summaryWrap>
@@ -105,8 +129,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               <a.graphTitle>
                 시선분포
               </a.graphTitle>
-              <a.graph>
-                시선분포 그래프
+              <a.graph imageUrl={`${BASE_URL}${gazeGraphPath}`}>
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>
@@ -124,8 +147,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               <a.graphTitle>
                 자세분포
               </a.graphTitle>
-              <a.graph>
-                자세분포 그래프
+              <a.graph imageUrl={`${BASE_URL}${poseGraphPath}`}>
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>
@@ -142,8 +164,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               <a.graphTitle>
                 목소리 분포
               </a.graphTitle>
-              <a.graph>
-                목소리 분포 그래프
+              <a.graph imageUrl={`${BASE_URL}${voiceGraphPath}`}>
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>
@@ -158,7 +179,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               <a.graphTitle>
                 표정분포
               </a.graphTitle>
-              <a.graph>
+              <a.graph imageUrl=''>
                 표정분포 그래프
               </a.graph>
               <a.graphSummaryWrap>
@@ -175,6 +196,8 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
       ) : (
         <p>선택된 질문이 없습니다</p>
       )}
+            
+    </div>
     </a.Container>
   )
 }

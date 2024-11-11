@@ -18,7 +18,7 @@ export const GlobalStyle = createGlobalStyle`
         padding: 0;
         font-weight: 400;
         line-height: 1.1;
-        max-width: 2400px;
+        max-width: 2600px;
     }
     a {
         outline: none;

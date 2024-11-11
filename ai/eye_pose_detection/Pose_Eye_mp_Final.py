@@ -46,7 +46,7 @@ with open("C:/Users/USER/Downloads/body_language.pkl", 'rb') as f:
     model = pickle.load(f)
 
 # 선택한 이미지를 불러옵니다
-overlay_image = cv2.imread('C:/Users/USER/Desktop/API/API/ai/eye_pose_detection/background.png', cv2.IMREAD_UNCHANGED)  # 이미지 파일 경로 지정
+# overlay_image = cv2.imread('C:/Users/USER/Desktop/pjt/API/ai/eye_pose_detection/background.png', cv2.IMREAD_UNCHANGED)  # 이미지 파일 경로 지정
 
 # 눈 좌표 범위
 LEFT_EYE_INDEXES = [33, 246, 161, 160, 159, 158, 157, 173, 133, 155, 154, 153, 145, 144, 163, 7]
@@ -425,7 +425,7 @@ plt.title('pose_normal_distribution')
 
 
 # print(first_angle)
-plt.savefig('C:/Users/USER/Desktop/API/API/ai/eye_pose_detection/output_plot/pose/posepy_test', bbox_inches='tight')
+plt.savefig('C:/Users/USER/Desktop/pjt/API/ai/eye_pose_detection/output_plot/pose/posepy_test', bbox_inches='tight')
 
 # plt.show()
 # plt.close()
@@ -481,7 +481,7 @@ plt.ylabel('Frequency')
 plt.title('eye_normal_distribution')
 # plt.show()
 
-plt.savefig('C:/Users/USER/Desktop/API/API/ai/eye_pose_detection/output_plot/eye/eyepy_test_2', bbox_inches='tight')
+plt.savefig('C:/Users/USER/Desktop/pjt/API/ai/eye_pose_detection/output_plot/eye/eyepy_test_2', bbox_inches='tight')
 
 end = time.time()
 
