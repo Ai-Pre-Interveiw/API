@@ -9,7 +9,7 @@ interface Response {
   resume: { filePath: string; uploadTime: string }[];
 }
 
-export const getResume = async (): Promise<AxiosResponse> => {
+export const getResume = async () => {
   try {
     const csrfToken = await getCsrfToken();
     const response = await axios.get(`${BASE_URL}/resume/`, {
@@ -18,12 +18,10 @@ export const getResume = async (): Promise<AxiosResponse> => {
       },
       withCredentials: true,
     });
-    return response; // 전체 Axios 응답 반환
-  } catch (error: any) {
-    if (error.response) {
-      throw new Error(error.response.data.email || error.response.data.error || '회원가입 실패');
-    }
-    throw new Error('네트워크 오류가 발생했습니다.');
+    return (response.data); // 전체 Axios 응답 반환
+  } catch (error) {
+    console.error("면접 조회 오류:", error);
+    throw error;
   }
 };
 

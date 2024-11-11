@@ -1,16 +1,24 @@
 import { BASE_URL } from '@utils/requestMethods'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as m from '@components/mypage/MyPageResume/MyPageResume.styled'
 import { useNavigate } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 import Modal from '@/common/Modal/index';
 import { useRecoilValue } from 'recoil';
 import { userState } from '@stores/user';
+import { getResume } from '@/apis/resume';
+
+interface Resume {
+  id: number;
+  filePath: string;
+  uploadTime: string;
+}
 
 const Index = () => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
   const user = useRecoilValue(userState);
+  const [resumes, setResumes] = useState<Resume[]>([]);
 
   const handleModalOpen = () => {
     setIsModalOpen(true); // 모달 열기
@@ -19,11 +27,20 @@ const Index = () => {
   const handleModalClose = () => {
     setIsModalOpen(false); // 모달 닫기
   };
+
+  useEffect(() => {
+    const loadResumes = async () => {
+      const resumeData = await getResume();
+      setResumes(resumeData); // resumes.data 대신 resumeData로 설정
+      console.log(resumeData);
+    };
+    loadResumes();
+  }, []);
   
   return (
     <>
     <m.Container>
-      {user.resume && user.resume.length > 0 ? 
+      {resumes && resumes.length > 0 ? 
       <m.SubMenu>
         이름
         <m.WrapTimeCheck>
@@ -36,18 +53,33 @@ const Index = () => {
         </m.WrapTimeCheck>
       </m.SubMenu>
       : <div></div>}
-      {user.resume && user.resume.length > 0 ?
+      {resumes && resumes.length > 0 ?
         <m.ResumeList>
-          {user.resume.map((resume, index) => (
+          {resumes
+          .slice() // 원본 배열을 변경하지 않기 위해 복사본을 생성
+          .reverse() // 역순으로 배열을 정렬
+          .map((resume, index) => (
             <m.ResumeItem key={index}>
               <m.ResumeItemName>
                 {resume.filePath.split('/').pop()}
               </m.ResumeItemName>
               <m.ResumeItemTimeButton>
-                {resume.uploadTime}
-                <FullButton text="자세히 보기" onClick={() => window.open(`${BASE_URL}/media/${resume.filePath}`, '_blank')} disabled/>
+                { // 한국 시간대로 포맷된 업로드 시간 생성
+                  new Intl.DateTimeFormat('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true, // 12시간제 형식 사용
+                  }).format(new Date(resume.uploadTime))}
+                <FullButton 
+                  text="자세히 보기" 
+                  onClick={() => window.open(`${BASE_URL}/media/${resume.filePath}`, '_blank')} 
+                  disabled
+                />
               </m.ResumeItemTimeButton>
-            </m.ResumeItem> // resume의 파일명을 표시
+            </m.ResumeItem>
           ))}
           <m.RegisterButton>
             <FullButton text="등록하기" onClick={handleModalOpen} disabled/>

@@ -28,15 +28,15 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
   if (name === '모의면접') {
     useEffect(() => {
       const loadResumes = async () => {
-        const resumes = await getResume();
-        setResumes(resumes.data)
+        const resumeData = await getResume();
+        setResumes(resumeData)
       }
       loadResumes();
     }, []);
   }
 
   const goMyPageOrStart = async () => {
-    if (user.resume.length !== 0) {
+    if (resumes && resumes.length !== 0) {
       // console.log(isExperienced)
       // console.log(resumes)
       // console.log(selectedResume)
@@ -66,6 +66,8 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
         scheduled_start: uploadTime,
         position: selectedJobField,
         experience_level: checkExperienced,
+        isProcessing: false,
+        isProcessed: false,
       }
       
       const response = await createInterview(createInterviewData)
@@ -111,14 +113,15 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
     }).format(new Date(response.uploadTime));
 
     // 현재 userState에서 resume 배열 업데이트
-    setUserState((prevState) => ({
-      ...prevState,
-      resume: [...prevState.resume, { filePath, uploadTime }] // resume 배열에 경로와 시간 추가
-    }));
+    // setUserState((prevState) => ({
+    //   ...prevState,
+    //   resume: [...prevState.resume, { filePath, uploadTime }] // resume 배열에 경로와 시간 추가
+    // }));
 
     console.log('파일 업로드:', selectedFile);
     console.log(user);
     onClose(); // 업로드 후 모달 닫기
+    window.location.reload();
   };
 
   // 타이머 상태 설정
@@ -280,14 +283,14 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
           ) : <div></div>}
           {name === '모의면접' ?
             <m.resumeWrap>
-              {resumes.length === 0 ? 
-              <m.NoOptionsMessage>등록된 자기소개서가 없습니다.</m.NoOptionsMessage>:
+              {resumes && resumes.length > 0 ? 
                 <m.StyledDropdown
-                  options={resumes.map((resume) => ({ value: resume.id.toString(), label: resume.filePath.split('/').pop() }))}
+                  options={resumes.slice().reverse().map((resume) => ({ value: resume.id.toString(), label: resume.filePath.split('/').pop() }))}
                   onChange={handleResumeSelect}
                   value={selectedResume ? selectedResume.toString() : undefined}
                   placeholder="자기소개서를 선택 해주세요."
-                />
+                />:
+                <m.NoOptionsMessage>등록된 자기소개서가 없습니다.</m.NoOptionsMessage>
               }
               <m.StyledDropdown
                 options={job_field.map((field) => ({ value: field, label: field }))}

@@ -13,6 +13,8 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import accuracy_score # Accuracy metrics 
 import pickle 
 import time
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 import math
@@ -29,7 +31,7 @@ def mp_pose_eye_infer(video):
     mp_drawing_styles = mp.solutions.drawing_styles
     mp_face_mesh = mp.solutions.face_mesh
 
-    with open("./ai_models/body_language.pkl", 'rb') as f:
+    with open("C:/Users/USER/Desktop/pjt/API/backend/ai_infer/ai_models/body_language.pkl", 'rb') as f:
         model = pickle.load(f)
 
     # 선택한 이미지를 불러옵니다
@@ -382,6 +384,8 @@ def mp_pose_eye_infer(video):
     cap.release()
     cv2.destroyAllWindows()
 
+    import matplotlib
+    matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     import numpy as np
     from matplotlib.patches import FancyBboxPatch
@@ -443,14 +447,15 @@ def mp_pose_eye_infer(video):
     
     # print(video_name)
     # print(first_angle)
-    pose_path = 'C:/Users/USER/Desktop/API/API/backend/media/graph/posture'
-    print(video_name)
+    pose_path = 'C:/Users/USER/Desktop/pjt/API/backend/media/graph/posture'
+    os.makedirs(pose_path, exist_ok=True)
+    # print(video_name)
     pose_graph_path =f'{pose_path}/{video_name}'
-    print(pose_graph_path, '포즈 그래프 패스')
+    # print(pose_graph_path, '포즈 그래프 패스')
     plt.savefig(pose_graph_path, bbox_inches='tight')
-
+    pose_graph_image_path = f'graph/posture/{video_name}'
     # plt.show()
-    # plt.close()
+    plt.close()
 
 
     # 데이터 불러오기
@@ -501,8 +506,12 @@ def mp_pose_eye_infer(video):
     # plt.ylabel('Frequency')
     # plt.title('eye_normal_distribution')
     # plt.show()
-    eye_path = 'C:/Users/USER/Desktop/API/API/backend/media/graph/gaze'
+    eye_path = 'C:/Users/USER/Desktop/pjt/API/backend/media/graph/gaze'
+    os.makedirs(eye_path, exist_ok=True)
     eye_graph_path = f'{eye_path}/{video_name}'
     # print(eye_graph_path)
     plt.savefig(eye_graph_path, bbox_inches='tight')
-    return print(video_name)
+    plt.close()
+    eye_graph_image_path = f'graph/gaze/{video_name}'
+    
+    return eye_graph_path + '.png', pose_graph_path + '.png', eye_graph_image_path + '.png', pose_graph_image_path + '.png'

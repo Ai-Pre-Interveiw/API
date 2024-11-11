@@ -13,7 +13,7 @@ const AnalysisDetailPage = () => {
   return (
     <a.Container>
       <AnalysisDetailHeader />
-      {id ? <AnalysisDetailSection id={id} /> : <div>잘못된 경로입니다.</div>};
+      {id ? <AnalysisDetailSection id={id} /> : <div>잘못된 경로입니다.</div>}
       <AnalysisDetailFooter />
     </a.Container>
   )

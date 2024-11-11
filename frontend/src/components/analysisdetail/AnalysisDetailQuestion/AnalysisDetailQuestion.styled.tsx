@@ -6,7 +6,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 285vh;
+  height: 335vh;
   padding-left: 1%;
   padding-right: 1%;
   overflow: hidden;
@@ -62,14 +62,19 @@ export const video = styled.video`
   }
 `;
 
-export const nervousGraph = styled.div`
+export const nervousGraph = styled.div<{ imageUrl: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: yellow;
+  background-color: white;
+  border-radius: 30px;
   // width: 10vw;
-  height: 42vh;
+  height: 47vh;
   width: 50vw;
+  background-image: url(${(props) => props.imageUrl}); /* 이미지 경로 설정 */
+  background-size: 90%;
+  background-repeat: no-repeat;
+  background-position: center;
 `
 
 export const summaryWrap = styled.div`
@@ -138,9 +143,9 @@ export const grapBigWrap = styled.div`
 `
 
 export const graphWrap = styled.div`
-  background-color: yellow;
+  // background-color: yellow;
   width: 40vw;
-  height: 60vh;
+  height: 80vh;
 `
 
 export const graphTitle = styled.div`
@@ -148,16 +153,21 @@ export const graphTitle = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background-color: blue;
+  // background-color: blue;
   padding: 1.5vh;
   font-weight: bold;
   font-size: 2.3vh;
 `
 
-export const graph = styled.div`
-  background-color: red;
+export const graph = styled.div<{ imageUrl: string }>`
+  background-color: white;
   margin: 2vh;
-  height: 40vh;
+  height: 60vh;
+  background-image: url(${(props) => props.imageUrl}); /* 이미지 경로 설정 */
+  background-size: 90%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 10px;
 `
 
 export const graphSummaryWrap = styled.div`
