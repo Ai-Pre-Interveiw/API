@@ -42,7 +42,7 @@ const Interviewing = () => {
     {
       name: '질문 시작1',
       texts: [
-        '마이크 테스트를 위해 하단의', '시작하기', '버튼을 누르고 테스트 문장을 확인해주세요.',
+        '마이크 테스트를 위해 하단의', '시작하기', '버튼을 누르고', '테스트 문장', '을 확인해주세요.',
         '',
         '확인 후', '답변하기', '버튼을 눌러 테스트 문장에 답변 해주시고',
         '답변을 완료하면 하단에', '답변완료', '버튼을 눌러주세요',
@@ -368,17 +368,19 @@ const Interviewing = () => {
               <i.textWrapRow>
                 <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[1]}</i.textWrap3>
                 <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[2]}</i.textWrap2>
-              </i.textWrapRow>
-              <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[3]}</i.textWrap2>
-              <i.textWrapRow>
+                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[3]}</i.textWrap3>
                 <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[4]}</i.textWrap2>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[5]}</i.textWrap3>
+              </i.textWrapRow>
+              <i.textWrap2></i.textWrap2>
+              <i.textWrapRow>
                 <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[6]}</i.textWrap2>
+                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[7]}</i.textWrap3>
+                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[8]}</i.textWrap2>
               </i.textWrapRow>
               <i.textWrapRow>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[7]}</i.textWrap2>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[8]}</i.textWrap3>
                 <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[9]}</i.textWrap2>
+                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[10]}</i.textWrap3>
+                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[11]}</i.textWrap2>
               </i.textWrapRow>
             </i.textWrap1>
             : currentQuestionIndex === 1 ?
@@ -386,31 +388,37 @@ const Interviewing = () => {
               <i.textWrapRow>
                 <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[0]}</i.textWrap2>
               </i.textWrapRow>
-              <i.textWrapRow>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[1]}</i.textWrap3>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[2]}</i.textWrap2>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[3]}</i.textWrap3>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[4]}</i.textWrap2>
-              </i.textWrapRow>
-              <i.textWrapRow>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[5]}</i.textWrap3>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[6]}</i.textWrap2>
-              </i.textWrapRow>
-              <i.textWrapRow>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[7]}</i.textWrap2>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[8]}</i.textWrap3>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[9]}</i.textWrap2>
-              </i.textWrapRow>
-              <i.textWrapRow>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[10]}</i.textWrap2>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[11]}</i.textWrap3>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[12]}</i.textWrap2>
-              </i.textWrapRow>
-              <i.textWrapRow>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[13]}</i.textWrap2>
-                <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[14]}</i.textWrap3>
-                <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[15]}</i.textWrap2>
-              </i.textWrapRow>
+              <i.textWrap2></i.textWrap2>
+              <i.textWrapAniate>
+                <i.textWrapRow>
+                  <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[1]}</i.textWrap3>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[2]}</i.textWrap2>
+                  <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[3]}</i.textWrap3>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[4]}</i.textWrap2>
+                </i.textWrapRow>
+                <i.textWrapRow>
+                  <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[5]}</i.textWrap3>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[6]}</i.textWrap2>
+                </i.textWrapRow>
+              </i.textWrapAniate>
+              <i.textWrap2></i.textWrap2>
+              <i.textWrapAniate2>
+                <i.textWrapRow>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[7]}</i.textWrap2>
+                  <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[8]}</i.textWrap3>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[9]}</i.textWrap2>
+                </i.textWrapRow>
+                <i.textWrapRow>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[10]}</i.textWrap2>
+                  <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[11]}</i.textWrap3>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[12]}</i.textWrap2>
+                </i.textWrapRow>
+                <i.textWrapRow>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[13]}</i.textWrap2>
+                  <i.textWrap3>{questionContent[currentQuestionIndex]?.texts[14]}</i.textWrap3>
+                  <i.textWrap2>{questionContent[currentQuestionIndex]?.texts[15]}</i.textWrap2>
+                </i.textWrapRow>
+              </i.textWrapAniate2>
             </i.textWrap1>
             : currentQuestionIndex !== 8 ?
             <i.textWrap1>

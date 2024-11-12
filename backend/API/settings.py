@@ -155,3 +155,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 VIDEO_FOLDER = 'C:/Users/USER/Desktop/API/API/backend/media/interview_videos'
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

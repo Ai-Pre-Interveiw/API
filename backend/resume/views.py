@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Resume, Question, Interview, InterviewResult
 from .serializers import ResumeGetSerializer, ResumeUploadSerializer, QuestionSerializer, InterviewSerializer, InterviewResultSerializer
+from ai_infer.question_gen import get_question
+import os
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -64,18 +66,6 @@ def get_specific_interview(request, interview_id):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# 기본 질문 리스트 설정
-DEFAULT_QUESTIONS = [
-    "자기 소개를 해주세요.",
-    "이 직무를 선택한 이유는 무엇인가요?",
-    "본인의 강점과 약점은 무엇인가요?",
-    "팀 프로젝트에서 맡았던 역할은 무엇인가요?",
-    "최근 읽은 책이나 관심 있는 주제가 무엇인가요?",
-    "입사 후 이루고 싶은 목표는 무엇인가요?",
-    "해결하기 어려웠던 경험과 극복 방법은 무엇인가요?",
-    "test",
-]
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_interview(request):
@@ -83,13 +73,39 @@ def create_interview(request):
     if serializer.is_valid():
         # 면접 생성
         interview = serializer.save()
-        
-        # 기본 질문 생성
-        for question_text in DEFAULT_QUESTIONS:
-            Question.objects.create(interview=interview, content=f'{question_text}, {interview}')
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_questions(request, interview_id):
+    
+    # 인터뷰 ID가 제공되지 않은 경우 에러 반환
+    if not interview_id:
+        return Response({"error": "Interview ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # 주어진 인터뷰 ID로 인터뷰를 가져옴
+    try:
+        interview = Interview.objects.get(id=interview_id)
+    except Interview.DoesNotExist:
+        return Response({"error": "Interview not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # 면접 정보 추출
+    position = interview.position
+    experience_level = interview.experience_level
+    resume_name = os.path.basename(interview.resume.file.name)
+
+    # 질문 생성 함수 호출
+    generated_questions = get_question(experience_level, position, resume_name)
+    
+    # 생성된 질문을 Interview와 연결하여 저장
+    for question_text in generated_questions:
+        Question.objects.create(interview=interview, content=question_text)
+
+    return Response({"message": "Questions generated successfully."}, status=status.HTTP_201_CREATED)
+
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])

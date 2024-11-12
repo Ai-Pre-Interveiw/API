@@ -84,6 +84,28 @@ export const createInterview = async (data: CreateInterviewData) => {
   }
 };
 
+// Question 생성 요청 함수
+export const createQuestion = async (interviewId: number) => {
+  try {
+    const csrfToken = await getCsrfToken(); // CSRF 토큰을 가져오는 함수가 있다고 가정
+    const response = await axios.post(
+      `${BASE_URL}/resume/interview/create/question/${interviewId}/`,
+      {},
+      {
+        headers: {
+          'X-CSRFToken': csrfToken, // CSRF 토큰 포함
+        },
+        withCredentials: true, // 인증 쿠키가 필요한 경우 설정
+      }
+    );
+    // console.log('Interview created:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Interview creation failed:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const getInterviewQuestions = async (interviewId: number) => {
   try {
     const csrfToken = await getCsrfToken(); // CSRF 토큰을 가져오는 함수가 있다고 가정

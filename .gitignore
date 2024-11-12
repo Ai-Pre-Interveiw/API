@@ -7,13 +7,19 @@
 
 .venv*
 mp_final
+.env
+vector_store
+*.h5
+*.pkl
 
 db.sqlite3
+
 *.pyc
 *.pdf
 *.mp4
 *.png
 *.wav
+
 # User-specific stuff
 .idea/**
 .idea/**/workspace.xml
