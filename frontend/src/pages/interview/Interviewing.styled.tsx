@@ -94,7 +94,44 @@ export const textWrap1 = styled.div`
   align-items: center;
   justify-content: center;
   gap: 3vh;
+  margin-bottom: 8vh;
   animation: ${fadeIn} 0.8s ease forwards; /* 0.8초 동안 부드럽게 나타남 */
+`
+
+export const textWrapAniate = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+  animation-delay: 2s;
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+`
+
+export const textWrapAniate2 = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+  animation-delay: 4s;
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
 `
 
 export const textWrapRow = styled.div`
@@ -144,18 +181,18 @@ export const thirtyTimer = styled.div<{ countdown: number }>`
   ${({ countdown }) =>
     countdown <= 5 &&
     css`
-      animation: ${shake} 1s infinite;
+      animation: ${shake} 0.2s infinite;
     `}
 `
 
 export const sixtyTimer = styled.div<{ countdown: number }>`
   font-weight: bold;
-
+  
   color: ${({ countdown }) => (countdown <= 10 ? 'red' : 'black')};
   ${({ countdown }) =>
     countdown <= 10 &&
     css`
-      animation: ${shake} 1s infinite;
+      animation: ${shake} 0.2s infinite;
     `}
 `
 
@@ -261,7 +298,7 @@ const walkingAnimation = keyframes`
 // 캐릭터 스타일
 export const Character = styled.div<{ progress: number }>`
   position: absolute;
-  top: -6vh; // 진행 바 위에 위치하도록 조정
+  top: -5.3vh; // 진행 바 위에 위치하도록 조정
   left: ${({ progress }) => progress - 5}%; // 진행도에 따라 위치 조정
   width: 6vw; // 캐릭터 크기
   height: 6vh;
@@ -269,5 +306,5 @@ export const Character = styled.div<{ progress: number }>`
   background-size: contain;
   background-repeat: no-repeat;
   transition: left 1s linear; // 부드럽게 이동
-  animation: ${walkingAnimation} 1s steps(2) infinite; // 걷는 애니메이션 추가
+  // animation: ${walkingAnimation} 1s steps(2) infinite; // 걷는 애니메이션 추가
 `;

@@ -58,6 +58,7 @@ def inference_eye_pose(request, interview_id):
 
                     # mp_pose_eye_infer 함수로 그래프 이미지 경로 생성
                     eye_graph_path, pose_graph_path, eye_graph_image_path, pose_graph_image_path = mp_pose_eye_infer(video_path)
+                    exp_graph_output_path, exp_graph_path = face_recognition(video_path)
                     print(f'여기인가 {eye_graph_path}')
                     print(f'아님여기 {eye_graph_image_path}')
                     # # 파일 생성 대기 루프 (최대 10초 대기)
@@ -72,12 +73,12 @@ def inference_eye_pose(request, interview_id):
                     #     # print(f"Waiting for files: {eye_graph_path} and {pose_graph_path}")
 
                     # 파일이 생성된 경우에만 업데이트
-                    if os.path.exists(eye_graph_path) and os.path.exists(pose_graph_path):
+                    if os.path.exists(eye_graph_path) and os.path.exists(pose_graph_path) and os.path.exists(exp_graph_output_path):
                         
                         # FileField에 경로만 할당
                         interview_result.gaze_distribution_path = eye_graph_image_path
                         interview_result.posture_distribution_path = pose_graph_image_path
-
+                        interview_result.expression_distribution_path = exp_graph_path
                         # 모델 저장
                         interview_result.save()
                         
@@ -150,16 +151,6 @@ def inference_eye_pose(request, interview_id):
             interview_result.save()
 
             processed_videos.append(video_file)
-
-            # with open(voice_graph_output_path, 'rb') as voice_graph_image_file, open(voice_ent_graph_output_path, 'rb') as voice_ent_graph_image_flie:
-            #     interview_result.voice_distribution_path.save(
-            #         os.path.basename(voice_graph_path), File(voice_graph_image_file), save=True
-            #     )
-            #     print(f"Saved voice_distribution_path: {interview_result.voice_distribution_path}")
-            #     interview_result.voice_ent_distribution_path.save(
-            #         os.path.basename(voice_ent_graph_path), File(voice_ent_graph_image_flie), save=True
-            #     )
-            #     print(f"Saved voice_ent_distribution_path: {interview_result.voice_ent_distribution_path}")
 
         except (Interview.DoesNotExist, Question.DoesNotExist, InterviewResult.DoesNotExist) as e:
             print('파일 저장 안된다고~~~~')

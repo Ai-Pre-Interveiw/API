@@ -40,6 +40,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
   const poseGraphPath = Array.isArray(data) && data.length > 0 ? data[0].posture_distribution_path : null;
   const anxietyGraphPath = Array.isArray(data) && data.length > 0 ? data[0].anxiety_graph_path : null;
   const voiceGraphPath = Array.isArray(data) && data.length > 0 ? data[0].voice_distribution_path : null;
+  const expressionGraphPath = Array.isArray(data) && data.length > 0 ? data[0].expression_distribution_path : null;
 
   console.log(data);
   console.log(anxietyGraphPath)
@@ -179,8 +180,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               <a.graphTitle>
                 표정분포
               </a.graphTitle>
-              <a.graph imageUrl=''>
-                표정분포 그래프
+              <a.graph imageUrl={`${BASE_URL}${expressionGraphPath}`}>
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>

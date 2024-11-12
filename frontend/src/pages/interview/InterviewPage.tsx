@@ -5,6 +5,8 @@ import * as i from '@pages/interview/InterviewPage.styled'
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
+import { createQuestion } from '@/apis/interview'
+import { question } from '@/components/analysisdetail/AnalysisDetailQuestion/AnalysisDetailQuestion.styled'
 
 
 const InterviewPage = () => {
@@ -27,16 +29,24 @@ const InterviewPage = () => {
     navigate('/interviewing', { state: { interviewId: interviewId } })
   }
 
-  // useEffect for auto-advance from page 4 to 5 after 5 seconds
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (currentPage === 4) {
-      timer = setTimeout(() => {
+    const createQuestions = async () => {
+      try {
+        const questionResponse = await createQuestion(interviewId);
+        console.log(questionResponse);
+        
+        // 페이지를 요청 완료 후 5로 설정하여 다음 단계로 이동
         setCurrentPage(5);
-      }, 5000); // 5 seconds delay
+      } catch (error) {
+        console.error("면접을 불러오는 중 오류가 발생했습니다:", error);
+      }
+    };
+
+    // currentPage가 4일 때 createQuestions를 호출
+    if (currentPage === 1) {
+      createQuestions();
     }
-    return () => clearTimeout(timer); // Clear the timer on cleanup
-  }, [currentPage]);
+  }, [currentPage, interviewId]); // currentPage와 interviewId에 의존
 
   return (
     <i.Container>
@@ -84,7 +94,7 @@ const InterviewPage = () => {
       }
       <InterviewFooter />
       <i.WrapButton>
-        {currentPage !== 1 ?
+        {currentPage !== 1 && currentPage !==5 ?
           <FullButton text='이전으로' onClick={handlePrevPage} disabled/> :
           <div></div>}
         {currentPage === 4 ? 

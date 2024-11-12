@@ -64,6 +64,19 @@ export const TextWrapper = styled.div`
   animation-delay: 0.2s; /* 약간의 딜레이 추가 */
 `;
 
+export const TextWrapper1 = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  height: 10vh;
+  width: 40vw;
+  gap: 5vh;
+  margin-bottom: 10vh;
+  // opacity: 0; /* 초기 상태에서 요소가 보이지 않도록 설정 */
+  // animation: ${fadeInScale} 0.8s ease-out forwards; /* 애니메이션 적용 후 보이도록 설정 */
+  animation-delay: 0.2s; /* 약간의 딜레이 추가 */
+`;
+
 export const TextWrapper2 = styled.div`
   display: flex;
   flex-direction: column;
@@ -78,7 +91,7 @@ export const Text1 = styled.div`
   font-size: 5vh;
   font-weight: bold;
   color: ${colors.purple};
-  margin-left: 0.5vw;
+  // margin-left: 0.5vw;
   margin-right: 0.5vw;
 `;
 

@@ -71,8 +71,8 @@ const Index = (props: ModalType & { openSecondModal: () => void }) => {  // 두 
       }
       
       const response = await createInterview(createInterviewData)
-      // console.log(response.id)
       navigate('/interview', { state: { interviewId: response.id } })
+      // console.log(response.id)
     } else {
       onClose(); // 첫 번째 모달 닫기
       openSecondModal(); // 두 번째 모달 열기
