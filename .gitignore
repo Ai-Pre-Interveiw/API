@@ -11,6 +11,9 @@ mp_final
 vector_store
 *.h5
 *.pkl
+*.mp3
+
+stt_model*
 
 db.sqlite3
 

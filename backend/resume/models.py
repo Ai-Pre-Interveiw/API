@@ -32,10 +32,11 @@ class Interview(models.Model):
     def __str__(self):
         return f"Interview for {self.resume.user.email} at {self.position} on {self.scheduled_start} ({self.get_experience_level_display()}), {self.id}"
 
-# 질문 모델 수정
+
 class Question(models.Model):
     interview = models.ForeignKey(Interview, on_delete=models.CASCADE, related_name='questions', null=True, blank=True)
     content = models.TextField()  # 질문 내용을 저장하는 필드
+    audio_file = models.FileField(upload_to='questions/audio/', null=True, blank=True)  # mp3 파일을 저장하는 필드
     created_at = models.DateTimeField(auto_now_add=True)  # 질문 생성 시간
 
     def __str__(self):
@@ -59,6 +60,7 @@ class InterviewResult(models.Model):
     expression_distribution_path = models.FileField(upload_to="graph/expression/", blank=True, null=True)  # 표정 분포 그래프 이미지 경로
 
     # 추가 분석 데이터
+    answer_text = models.JSONField(default=list, blank=True)
     filler_word_positions = models.JSONField(default=list, blank=True)  # 미사여구 위치 리스트
     follow_up_questions = models.JSONField(default=list, blank=True)
 

@@ -91,9 +91,16 @@ export const Text1 = styled.div`
   font-size: 5vh;
   font-weight: bold;
   color: ${colors.purple};
-  // margin-left: 0.5vw;
+  margin-left: 0.5vw;
   margin-right: 0.5vw;
 `;
+
+export const Text12 = styled.div`
+  font-size: 5vh;
+  font-weight: bold;
+  color: ${colors.purple};
+  margin-right: 0.5vw;
+`
 
 export const Text2 = styled.div`
   font-size: 3.5vh;

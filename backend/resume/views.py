@@ -7,6 +7,7 @@ from .models import Resume, Question, Interview, InterviewResult
 from .serializers import ResumeGetSerializer, ResumeUploadSerializer, QuestionSerializer, InterviewSerializer, InterviewResultSerializer
 from ai_infer.question_gen import get_question
 import os
+from .TTS_infer import tts_infer
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -78,6 +79,7 @@ def create_interview(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# 질문 생성
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def generate_questions(request, interview_id):
@@ -102,7 +104,15 @@ def generate_questions(request, interview_id):
     
     # 생성된 질문을 Interview와 연결하여 저장
     for question_text in generated_questions:
-        Question.objects.create(interview=interview, content=question_text)
+        question = Question.objects.create(interview=interview, content=question_text)
+        if question_text == '1분 자기소개를 해주세요.':
+            question.audio_file = ''
+            question.save()
+        else:
+            seepch_file_path, tts_path = tts_infer(question_text, question.id)
+            if os.path.exists(seepch_file_path):
+                question.audio_file = tts_path
+                question.save()
 
     return Response({"message": "Questions generated successfully."}, status=status.HTTP_201_CREATED)
 

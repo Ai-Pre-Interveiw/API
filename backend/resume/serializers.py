@@ -28,7 +28,7 @@ class ResumeUploadSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ['content']  # 필요한 필드를 지정
+        fields = ['content', 'audio_file']  # 필요한 필드를 지정
 
 
 class InterviewSerializer(serializers.ModelSerializer):
@@ -42,4 +42,18 @@ class InterviewResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InterviewResult
-        fields = ['id', 'video_path', 'question', 'question_detail', 'created_at', 'updated_at', 'interview', 'anxiety_graph_path', 'gaze_distribution_path', 'posture_distribution_path', 'voice_distribution_path', 'expression_distribution_path']
+        fields = ['id',
+                  'video_path',
+                  'question',
+                  'question_detail',
+                  'created_at', 
+                  'updated_at',
+                  'interview',
+                  'anxiety_graph_path',
+                  'gaze_distribution_path',
+                  'posture_distribution_path',
+                  'voice_distribution_path',
+                  'expression_distribution_path',
+                  'answer_text',
+                  'follow_up_questions',
+                  'filler_word_positions',]

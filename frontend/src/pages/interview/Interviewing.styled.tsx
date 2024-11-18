@@ -289,22 +289,17 @@ export const barTimerWrap = styled.div`
   // background-color: yellow;
 `
 
-// 걷는 효과를 위한 애니메이션 정의
-const walkingAnimation = keyframes`
-  0% { transform: rotate(15deg); }
-  100% { transform: rotate(-5deg); }
-`;
 
 // 캐릭터 스타일
 export const Character = styled.div<{ progress: number }>`
   position: absolute;
-  top: -5.3vh; // 진행 바 위에 위치하도록 조정
-  left: ${({ progress }) => progress - 5}%; // 진행도에 따라 위치 조정
-  width: 6vw; // 캐릭터 크기
-  height: 6vh;
+  top: -5.8vh; // 진행 바 위에 위치하도록 조정
+  left: ${({ progress }) => progress - 15}%; // 진행도에 따라 위치 조정
+  width: 8vw; // 캐릭터 크기
+  height: 8vh;
   background-image: url('/images/bar.png'); // 캐릭터 이미지 경로
   background-size: contain;
   background-repeat: no-repeat;
   transition: left 1s linear; // 부드럽게 이동
-  // animation: ${walkingAnimation} 1s steps(2) infinite; // 걷는 애니메이션 추가
+  transform: scaleX(-1);
 `;

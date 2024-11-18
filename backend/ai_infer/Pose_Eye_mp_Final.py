@@ -22,7 +22,7 @@ import time
 import datetime
 
 
-def mp_pose_eye_infer(video):
+def mp_pose_eye_infer(video, question_id, first_angle, standard_eye):
     global np  # np 모듈을 이 함수에서도 전역으로 선언
     video_name = video.split('/')[-1].split('.')[0]
     mp_drawing = mp.solutions.drawing_utils
@@ -106,6 +106,8 @@ def mp_pose_eye_infer(video):
     # right_uclid_distance = []
     uclid_distance = []
     angles = []
+    first_video_angles = []
+    first_video_uclid = []
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -165,78 +167,17 @@ def mp_pose_eye_infer(video):
         # 얼굴 랜드마크 그리기 및 눈동자 추출
         face_result = face_mesh.process(image)
         
-        try:
+        if question_id % 8 == 0:
             landmarks = results.pose_landmarks.landmark
             # Get coordinates
             left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
             right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
             
+            
             # # Calculate angle
             angle = calculate_angle(left_shoulder, right_shoulder)
-            angles.append(angle)
-            first_angle = angles[0]
-            # print(first_angle)
-            # Curl counter logic
-            temp_pose = ''
-            if not first_angle-2 < angle and angle < first_angle+2:
-                pose_bad_count += 1
-                total_pose_bad_count += 1
-                temp_pose = 'BAD' 
-            else:
-                pose_good_count += 1
-                total_pose_good_count += 1
-                temp_pose = 'GOOD'
-            pose_frame_counter += 1
+            first_video_angles.append(angle)
 
-            if pose_frame_counter >= 30:
-                avg_pose_bad_count_per_second = round(total_pose_bad_count / 30, 8)
-                avg_pose_good_count_per_second = round(total_pose_good_count / 30, 8)
-
-                # 변수 리셋
-                pose_frame_counter = 0
-                total_pose_bad_count = 0
-                total_pose_good_count = 0
-                
-
-
-            # Extract Pose landmarks
-            pose = results.pose_landmarks.landmark
-            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
-            
-            # Extract Face landmarks
-            face = results.face_landmarks.landmark
-            face_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in face]).flatten())
-            
-            # Concate rows
-            row = pose_row+face_row
-            
-            # Make Detections
-            X = np.array([row])
-
-            body_language_class = model.predict(X)[0]
-            body_language_prob = model.predict_proba(X)[0]
-            # Get status box
-            cv2.putText(image, f'angle : {angle}', (10,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
-            cv2.putText(image, f'good_pose_count : {avg_pose_good_count_per_second}', (10,65), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
-            cv2.putText(image, f'bad_pose_count : {avg_pose_bad_count_per_second}', (10,105), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
-            cv2.putText(image, f'Pose is good?: {temp_pose}', (10, 235), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 1, cv2.LINE_AA)
-            
-            #Time
-            now = time.gmtime(time.time())
-            
-            cv2.putText(image, 'Time', 
-                        (440,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
-            seconds = 0
-            minute = 0
-            if now.tm_sec < start.tm_sec:
-                seconds = 60 - start.tm_sec + now.tm_sec
-            else:
-                seconds = abs(now.tm_sec - start.tm_sec)
-
-            cv2.putText(image, str(minute) +' : '+ str(seconds),
-                        (500,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
-            
-            # 얼굴 랜드마크가 있으면 처리
             if face_result.multi_face_landmarks:
                 for face_landmark in face_result.multi_face_landmarks:
                     
@@ -256,152 +197,249 @@ def mp_pose_eye_infer(video):
                     # left_uclid_distance.append(np.linalg.norm(left_eye - val_left_iris_center))
                     # right_uclid_distance.append(np.linalg.norm(right_eye - val_right_iris_center))
 
-                    temp = (np.linalg.norm(left_eye - val_left_iris_center) + np.linalg.norm(right_eye - val_right_iris_center)) / 2
-
-                    uclid_distance.append(temp)
-                    # 홍채 중심에 원 그리기
                     cv2.circle(image, tuple(left_iris_center), 3, (255, 0, 0), -1)
                     cv2.circle(image, tuple(right_iris_center), 3, (255, 0, 0), -1)
 
                     # 왼쪽 눈동자 중심 계산
                     left_eye_center = np.mean(left_eye, axis=0)
                     right_eye_center = np.mean(right_eye, axis=0)
+                    center_temp = (np.linalg.norm(left_eye_center - val_left_iris_center) +  np.linalg.norm(right_eye_center - val_right_iris_center))/ 2
+                    first_video_uclid.append(center_temp)
+        
+            return np.average(first_video_angles), np.average(first_video_uclid)
+        else:
+            try:
+                landmarks = results.pose_landmarks.landmark
+                # Get coordinates
+                left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                
+                # # Calculate angle
+                angle = calculate_angle(left_shoulder, right_shoulder)
+                angles.append(angle)
+                # first_angle = angles[0]
+                # print(first_angle)
+                # Curl counter logic
+                temp_pose = ''
+                if not first_angle-2 < angle and angle < first_angle+2:
+                    pose_bad_count += 1
+                    total_pose_bad_count += 1
+                    temp_pose = 'BAD' 
+                else:
+                    pose_good_count += 1
+                    total_pose_good_count += 1
+                    temp_pose = 'GOOD'
+                pose_frame_counter += 1
 
-                    # 눈동자 중심에 원 그리기
-                    # cv2.circle(image, tuple(left_eye_center), 3, (0, 255, 0), -1)
-                    # cv2.circle(image, tuple(right_eye_center), 3, (0, 255, 0), -1)
+                if pose_frame_counter >= 30:
+                    avg_pose_bad_count_per_second = round(total_pose_bad_count / 30, 8)
+                    avg_pose_good_count_per_second = round(total_pose_good_count / 30, 8)
 
-                    left_eye_direction = ''
-                    right_eye_direction = ''
-
-                    if -3 < left_eye_center[0] - val_left_iris_center[0] <= 2 and 0.3 <= left_eye_center[1] - val_left_iris_center[1] <= 1.7:
-                        left_eye_direction = 'center'
-                    elif abs(val_left_iris_center[0] - left_eye_center[0]) <= 3 and  left_eye_center[1] - val_left_iris_center[1] > 1.7:
-                        left_eye_direction = 'top'
-                    elif abs(val_left_iris_center[0] - left_eye_center[0]) <= 3 and  left_eye_center[1] - val_left_iris_center[1] < 0.3:
-                        left_eye_direction = 'bottom'
-                    elif left_eye_center[0] - val_left_iris_center[0] > 2:
-                        left_eye_direction = 'left'
-                    elif left_eye_center[0] - val_left_iris_center[0] < -3:
-                        left_eye_direction = 'right'
-
-                    if  -2.5 <= right_eye_center[0] - val_right_iris_center[0] <= 2.5 and 0.3 <= right_eye_center[1] - val_right_iris_center[1] <= 1.7:
-                        right_eye_direction = 'center'
-                    elif abs(val_right_iris_center[0] - right_eye_center[0]) <= 3 and right_eye_center[1] - val_right_iris_center[1] > 1.7:
-                        right_eye_direction = 'top'
-                    elif abs(val_right_iris_center[0] - right_eye_center[0]) <= 3 and right_eye_center[1] - val_right_iris_center[1] < 0.3:
-                        right_eye_direction = 'bottom'
-                    elif right_eye_center[0] - val_right_iris_center[0] > 2.5:
-                        right_eye_direction = 'left'
-                    elif right_eye_center[0] - val_right_iris_center[0] < -2.5:
-                        right_eye_direction = 'right'
-
-                    eye_temp = ''
-                    
-                    if left_eye_direction == right_eye_direction and left_eye_direction != 'center':
-                        eye_bad_count += 1
-                        total_eye_bad_count += 1
-                        # good_count = 0
-                        eye_temp='BAD'
-                    else:
-                        eye_good_count += 1
-                        total_eye_good_count += 1
-                        eye_temp='GOOD'
-
-                    eye_frame_counter += 1
-
-                    if eye_frame_counter >= 30:
-                        avg_eye_bad_count_per_second = round(total_eye_bad_count / 30, 8)
-                        avg_eye_good_count_per_second = round(total_eye_good_count / 30, 8)
-
-                        # 변수 리셋
-                        eye_frame_counter = 0
-                        total_eye_bad_count = 0
-                        total_eye_good_count = 0
+                    # 변수 리셋
+                    pose_frame_counter = 0
+                    total_pose_bad_count = 0
+                    total_pose_good_count = 0
                     
 
-                    # 홍채 좌표 출력
-                    cv2.putText(image, f'L Iris: {val_left_iris_center}', (440, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    cv2.putText(image, f'R Iris: {val_right_iris_center}', (440, 145), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    # 눈동자 중심 좌표 출력
-                    cv2.putText(image, f'L eye: {left_eye_center}', (440, 105), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    cv2.putText(image, f'R eye: {right_eye_center}', (440, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    # 눈 방향
-                    cv2.putText(image, f'good eye count: {avg_eye_good_count_per_second}', (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    cv2.putText(image, f'bad eye count: {avg_eye_bad_count_per_second}', (10, 145), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    # 시선 벗어났는지
-                    cv2.putText(image, f'Eye is good?: {eye_temp}', (620, 235), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 1, cv2.LINE_AA)
-                    # cv2.putText(image, f'L eye direction: {avg_eye_bad_count_per_second}', (10, 145), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    # cv2.putText(image, f'R eye direction: {avg_eye_good_count_per_second}', (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-                    
-        except Exception as e:
-            print(e)
+
+                # Extract Pose landmarks
+                pose = results.pose_landmarks.landmark
+                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
+                
+                # Extract Face landmarks
+                face = results.face_landmarks.landmark
+                face_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in face]).flatten())
+                
+                # Concate rows
+                row = pose_row+face_row
+                
+                # Make Detections
+                X = np.array([row])
+
+                body_language_class = model.predict(X)[0]
+                body_language_prob = model.predict_proba(X)[0]
+                # # Get status box
+                # cv2.putText(image, f'angle : {angle}', (10,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
+                # cv2.putText(image, f'good_pose_count : {avg_pose_good_count_per_second}', (10,65), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
+                # cv2.putText(image, f'bad_pose_count : {avg_pose_bad_count_per_second}', (10,105), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
+                # cv2.putText(image, f'Pose is good?: {temp_pose}', (10, 235), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 1, cv2.LINE_AA)
+                
+                # #Time
+                # now = time.gmtime(time.time())
+                
+                # cv2.putText(image, 'Time', 
+                #             (440,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
+                # seconds = 0
+                # minute = 0
+                # if now.tm_sec < start.tm_sec:
+                #     seconds = 60 - start.tm_sec + now.tm_sec
+                # else:
+                #     seconds = abs(now.tm_sec - start.tm_sec)
+
+                # cv2.putText(image, str(minute) +' : '+ str(seconds),
+                #             (500,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 1, cv2.LINE_AA)
+                
+                # 얼굴 랜드마크가 있으면 처리
+                if face_result.multi_face_landmarks:
+                    for face_landmark in face_result.multi_face_landmarks:
+                        
+                        # 왼쪽 눈과 오른쪽 눈 영역 추출 (크기 비율 적용)
+                        left_eye = get_eye_region(face_landmark.landmark, LEFT_EYE_INDEXES, scale_x, scale_y)
+                        right_eye = get_eye_region(face_landmark.landmark, RIGHT_EYE_INDEXES, scale_x, scale_y)
+
+                        # 눈 영역에 다각형 그리기
+                        cv2.polylines(image, [left_eye], isClosed=True, color=(0, 255, 0), thickness=1)
+                        cv2.polylines(image, [right_eye], isClosed=True, color=(0, 255, 0), thickness=1)
+
+                        # 왼쪽 및 오른쪽 홍채 중심 추출
+                        left_iris_center, val_left_iris_center = get_iris_center(face_landmark.landmark, LEFT_IRIS_INDEXES, scale_x, scale_y)
+                        right_iris_center, val_right_iris_center = get_iris_center(face_landmark.landmark, RIGHT_IRIS_INDEXES, scale_x, scale_y)
+                        left_iris_list.append(val_left_iris_center)
+                        right_iris_list.append(val_right_iris_center)
+                        # left_uclid_distance.append(np.linalg.norm(left_eye - val_left_iris_center))
+                        # right_uclid_distance.append(np.linalg.norm(right_eye - val_right_iris_center))
+
+                        # 홍채 중심에 원 그리기
+                        cv2.circle(image, tuple(left_iris_center), 3, (255, 0, 0), -1)
+                        cv2.circle(image, tuple(right_iris_center), 3, (255, 0, 0), -1)
+
+                        # 왼쪽 눈동자 중심 계산
+                        left_eye_center = np.mean(left_eye, axis=0)
+                        right_eye_center = np.mean(right_eye, axis=0)
+                        temp = (np.linalg.norm(left_eye_center - val_left_iris_center) + np.linalg.norm(right_eye_center - val_right_iris_center)) / 2
+                        uclid_distance.append(temp)
+                        # 눈동자 중심에 원 그리기
+                        # cv2.circle(image, tuple(left_eye_center), 3, (0, 255, 0), -1)
+                        # cv2.circle(image, tuple(right_eye_center), 3, (0, 255, 0), -1)
+
+                        left_eye_direction = ''
+                        right_eye_direction = ''
+
+                        if -3 < left_eye_center[0] - val_left_iris_center[0] <= 2 and 0.3 <= left_eye_center[1] - val_left_iris_center[1] <= 1.7:
+                            left_eye_direction = 'center'
+                        elif abs(val_left_iris_center[0] - left_eye_center[0]) <= 3 and  left_eye_center[1] - val_left_iris_center[1] > 1.7:
+                            left_eye_direction = 'top'
+                        elif abs(val_left_iris_center[0] - left_eye_center[0]) <= 3 and  left_eye_center[1] - val_left_iris_center[1] < 0.3:
+                            left_eye_direction = 'bottom'
+                        elif left_eye_center[0] - val_left_iris_center[0] > 2:
+                            left_eye_direction = 'left'
+                        elif left_eye_center[0] - val_left_iris_center[0] < -3:
+                            left_eye_direction = 'right'
+
+                        if  -2.5 <= right_eye_center[0] - val_right_iris_center[0] <= 2.5 and 0.3 <= right_eye_center[1] - val_right_iris_center[1] <= 1.7:
+                            right_eye_direction = 'center'
+                        elif abs(val_right_iris_center[0] - right_eye_center[0]) <= 3 and right_eye_center[1] - val_right_iris_center[1] > 1.7:
+                            right_eye_direction = 'top'
+                        elif abs(val_right_iris_center[0] - right_eye_center[0]) <= 3 and right_eye_center[1] - val_right_iris_center[1] < 0.3:
+                            right_eye_direction = 'bottom'
+                        elif right_eye_center[0] - val_right_iris_center[0] > 2.5:
+                            right_eye_direction = 'left'
+                        elif right_eye_center[0] - val_right_iris_center[0] < -2.5:
+                            right_eye_direction = 'right'
+
+                        eye_temp = ''
+                        
+                        if left_eye_direction == right_eye_direction and left_eye_direction != 'center':
+                            eye_bad_count += 1
+                            total_eye_bad_count += 1
+                            # good_count = 0
+                            eye_temp='BAD'
+                        else:
+                            eye_good_count += 1
+                            total_eye_good_count += 1
+                            eye_temp='GOOD'
+
+                        eye_frame_counter += 1
+
+                        if eye_frame_counter >= 30:
+                            avg_eye_bad_count_per_second = round(total_eye_bad_count / 30, 8)
+                            avg_eye_good_count_per_second = round(total_eye_good_count / 30, 8)
+
+                            # 변수 리셋
+                            eye_frame_counter = 0
+                            total_eye_bad_count = 0
+                            total_eye_good_count = 0
+                        
+
+                        # 홍채 좌표 출력
+                        cv2.putText(image, f'L Iris: {val_left_iris_center}', (440, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        cv2.putText(image, f'R Iris: {val_right_iris_center}', (440, 145), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        # 눈동자 중심 좌표 출력
+                        cv2.putText(image, f'L eye: {left_eye_center}', (440, 105), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        cv2.putText(image, f'R eye: {right_eye_center}', (440, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        # 눈 방향
+                        cv2.putText(image, f'good eye count: {avg_eye_good_count_per_second}', (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        cv2.putText(image, f'bad eye count: {avg_eye_bad_count_per_second}', (10, 145), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        # 시선 벗어났는지
+                        cv2.putText(image, f'Eye is good?: {eye_temp}', (620, 235), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 1, cv2.LINE_AA)
+                        # cv2.putText(image, f'L eye direction: {avg_eye_bad_count_per_second}', (10, 145), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        # cv2.putText(image, f'R eye direction: {avg_eye_good_count_per_second}', (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
+                        
+            except Exception as e:
+                print(e)
+            
+            # # 원하는 이미지 크기와 위치 설정
+            # overlay_width = 600  # 이미지의 가로 크기
+            # overlay_height = 600  # 이미지의 세로 크기
+            # overlay_position = (180, 120)  # 이미지가 배치될 왼쪽 위 좌표 (x, y)
+
+            # # 선택한 이미지를 리사이즈
+
+            # overlay_resized = cv2.resize(overlay_image, (overlay_width, overlay_height))
+            
         
-        # # 원하는 이미지 크기와 위치 설정
-        # overlay_width = 600  # 이미지의 가로 크기
-        # overlay_height = 600  # 이미지의 세로 크기
-        # overlay_position = (180, 120)  # 이미지가 배치될 왼쪽 위 좌표 (x, y)
+            # # ROI(Region of Interest)를 설정하여 이미지를 해당 위치에 삽입
+            # x, y = overlay_position
+            # roi = image[y:y+overlay_height, x:x+overlay_width]
+            
+            # # 알파 채널 분리
+            # if overlay_resized.shape[2] == 4:  # 이미지가 알파 채널을 가지고 있는지 확인
+            #     overlay_img = overlay_resized[:, :, :3]  # RGB 채널
+            #     mask = overlay_resized[:, :, 3]  # 알파 채널
 
-        # # 선택한 이미지를 리사이즈
+            #     # 알파 채널을 [0, 1] 범위로 정규화
+            #     mask = mask / 255.0
 
-        # overlay_resized = cv2.resize(overlay_image, (overlay_width, overlay_height))
-        
-    
-        # # ROI(Region of Interest)를 설정하여 이미지를 해당 위치에 삽입
-        # x, y = overlay_position
-        # roi = image[y:y+overlay_height, x:x+overlay_width]
-        
-        # # 알파 채널 분리
-        # if overlay_resized.shape[2] == 4:  # 이미지가 알파 채널을 가지고 있는지 확인
-        #     overlay_img = overlay_resized[:, :, :3]  # RGB 채널
-        #     mask = overlay_resized[:, :, 3]  # 알파 채널
+            #     # 불투명도 조정 (원하는 값으로 alpha 설정)
+            #     alpha = 0.4  # 불투명도: 1.0은 완전 불투명, 0.0은 완전 투명
 
-        #     # 알파 채널을 [0, 1] 범위로 정규화
-        #     mask = mask / 255.0
+            #     # 배경에 원래 프레임의 해당 부분 복사
+            #     background = (1.0 - mask * alpha)[:, :, np.newaxis] * roi
+            #     # 전경에 overlay 이미지 복사
+            #     foreground = (mask * alpha)[:, :, np.newaxis] * overlay_img
 
-        #     # 불투명도 조정 (원하는 값으로 alpha 설정)
-        #     alpha = 0.4  # 불투명도: 1.0은 완전 불투명, 0.0은 완전 투명
+            #     # 배경과 전경을 더해 합성
+            #     blended = background + foreground
 
-        #     # 배경에 원래 프레임의 해당 부분 복사
-        #     background = (1.0 - mask * alpha)[:, :, np.newaxis] * roi
-        #     # 전경에 overlay 이미지 복사
-        #     foreground = (mask * alpha)[:, :, np.newaxis] * overlay_img
-
-        #     # 배경과 전경을 더해 합성
-        #     blended = background + foreground
-
-        #     # 합성된 이미지를 원본 프레임에 적용
-        #     image[y:y+overlay_height, x:x+overlay_width] = blended
-        
-        # 결과 이미지 출력
-        # cv2.imshow('Camera Feed with Transparent Image Overlay', image)
-        # q를 눌러서 종료
-        if cv2.waitKey(10) & 0xFF == 27:
-            break
+            #     # 합성된 이미지를 원본 프레임에 적용
+            #     image[y:y+overlay_height, x:x+overlay_width] = blended
+            
+            # 결과 이미지 출력
+            # cv2.imshow('Camera Feed with Transparent Image Overlay', image)
+            # q를 눌러서 종료
+            if cv2.waitKey(10) & 0xFF == 27:
+                break
         
         
 
     cap.release()
     cv2.destroyAllWindows()
 
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-    import numpy as np
+    
     from matplotlib.patches import FancyBboxPatch
-    def linear_function(x):
-        # 두 점 (800, 0.1)과 (450, 0.3)을 기준으로 기울기와 절편을 구함
-        x1, y1 = 800, 0.1
-        x2, y2 = 450, 0.3
+    # def linear_function(x):
+    #     # 두 점 (800, 0.1)과 (450, 0.3)을 기준으로 기울기와 절편을 구함
+    #     x1, y1 = 800, 0.1
+    #     x2, y2 = 450, 0.3
         
-        # 기울기 계산
-        a = (y2 - y1) / (x2 - x1)
+    #     # 기울기 계산
+    #     a = (y2 - y1) / (x2 - x1)
         
-        # 절편 계산
-        b = y1 - a * x1
+    #     # 절편 계산
+    #     b = y1 - a * x1
         
-        # 선형 함수 생성
-        return a * x + b
+    #     # 선형 함수 생성
+    #     return a * x + b
 
     # 함수 사용 예시
     # print(linear_function(500))  # 대략 0.1
@@ -411,39 +449,36 @@ def mp_pose_eye_infer(video):
 
     ## pose plot
     # print(angles)
-    pose_data = np.array(angles)
+    # 데이터 정규화
+    pose_data = np.array(angles) - np.mean(angles)
+    pose_sum = 0
+    for i in range(len(pose_data)):
+        pose_sum += (pose_data[i] - np.mean(pose_data)) ** 2
 
+    pose_std = np.sqrt(pose_sum / len(pose_data))
+
+    # 히스토그램 데이터 계산
     pose_counts, pose_bins = np.histogram(pose_data, bins=20)
+
+    # 히스토그램 플롯 설정
     plt.figure(figsize=(8, 5))
     ax = plt.gca()
 
-    for i in range(len(pose_bins) - 1):
-        if pose_counts[i] != 0:
-            x = pose_bins[i]
+    # 막대 그리기
+    bin_centers = 0.5 * (pose_bins[:-1] + pose_bins[1:])  # 각 bin의 중심값 계산
+    plt.bar(bin_centers, pose_counts, width=(pose_bins[1] - pose_bins[0]), color="#9137fc", edgecolor="white", zorder=5)
 
-            width = pose_bins[i + 1] - pose_bins[i]
-            
-            height = pose_counts[i]
-
-            pose_rounding_size = height * 0.000125
-
-            rect_pose = FancyBboxPatch((x, 0), width, height,
-                                boxstyle=f"round,pad=0,rounding_size={pose_rounding_size}",
-                                edgecolor="white", facecolor="#9137fc", zorder=5)
-            ax.add_patch(rect_pose)
-
-    # 축 범위 설정
-    ax.set_xlim(pose_bins[0], pose_bins[-1])
+    # 축 범위 설정 (0을 중앙값으로 대칭 범위 설정)
+    xmin, xmax = min(pose_data), max(pose_data)
+    max_abs = max(abs(xmin), abs(xmax))  # 0 기준 대칭 범위 계산
+    ax.set_xlim(-max_abs, max_abs)      # x축 대칭 설정
     ax.set_ylim(0, max(pose_counts) + 2)
+
+    ax.axvline(x=0, color='red', linestyle='--', linewidth=1.5, label='Center (0)', zorder=10)
 
     # 격자 다루기
     plt.grid(axis='y', linestyle='--', alpha=0.5)
     plt.grid(False, axis='x')
-
-    # 축 및 제목 설정
-    # plt.xlabel('Value')
-    # plt.ylabel('Frequency')
-    # plt.title('pose_normal_distribution')
     
     # print(video_name)
     # print(first_angle)
@@ -459,53 +494,53 @@ def mp_pose_eye_infer(video):
 
 
     # 데이터 불러오기
-    data = np.array(uclid_distance)
-    mean = np.mean(data)
-    std_dev = np.std(data)
+    # avg_uclid = np.average(data)
+    # sum_sqrt_uclid = 0
+    # for v in data:
+    #     sum_sqrt_uclid += np.sqrt(v - avg_uclid)
 
+    # std_uclid = sum_sqrt_uclid / len(data)
+
+
+    eye_data = np.array(uclid_distance) - np.mean(uclid_distance)
+    
+    eye_sum = 0
+    for i in range(len(eye_data)):
+        eye_sum += (eye_data[i] - np.mean(eye_data)) ** 2
+
+    eye_std = np.sqrt(eye_sum / len(eye_data))
+    
     # 히스토그램 데이터 계산
-    eye_counts, eye_bins = np.histogram(data, bins=20)
+    eye_counts, eye_bins = np.histogram(eye_data, bins=20)
 
     # 히스토그램 플롯 설정
     plt.figure(figsize=(8, 5))
     ax = plt.gca()
 
     # 격자 다루기
-    ax.grid(zorder=0)
-    plt.grid(axis='y', linestyle='--', alpha=0.5)
-    plt.grid(False, axis='x')
+    ax.grid(zorder=0, axis='y', linestyle='--', alpha=0.5)
 
-    # 각 막대를 둥근 모서리로 그리기
-    for i in range(len(eye_bins) - 1):
-        if eye_counts[i] != 0:
-            x = eye_bins[i]
-
-            width = eye_bins[i + 1] - eye_bins[i]
-            
-            height = eye_counts[i]
-
-            eye_rounding_size = height * 0.003
-
-            rect = FancyBboxPatch((x, 0), width, height,
-                                boxstyle=f"round,pad=0,rounding_size={eye_rounding_size}",
-                                edgecolor="white", facecolor="#9137fc", zorder=7)
-            ax.add_patch(rect)
-
-    # # 정규분포 곡선 계산 
-    # xmin, xmax = plt.xlim()
+    # 막대 그리기
+    bin_centers = 0.5 * (eye_bins[:-1] + eye_bins[1:])  # 각 bin의 중심값 계산
+    plt.bar(bin_centers, eye_counts, width=(eye_bins[1] - eye_bins[0]), color="#9137fc", edgecolor="white", zorder=5)
+    
+    # 정규분포 곡선 추가
+    xmin, xmax = min(eye_data), max(eye_data)
     # x = np.linspace(xmin, xmax, 100)
     # p = norm.pdf(x, mean, std_dev)
     # plt.plot(x, p, 'k', linewidth=2, label='Normal Distribution')
+    # plt.legend()
 
-    # 축 범위 설정
-    ax.set_xlim(eye_bins[0], eye_bins[-1])
-    ax.set_ylim(0, max(eye_counts) + 2)
+    # 축 범위 설정 및 레이블 추가
+    max_abs = max(abs(xmin), abs(xmax)) # 0을 기준으로 대칭 범위 계산
+    ax.set_xlim(-max_abs, max_abs)      # x축을 0 기준 대칭으로 설정
+    ax.set_ylim(0, max(eye_counts) + 2) # y축 범위 설정
+    # ax.set_xlabel('Value')
+    # ax.set_ylabel('Frequency')
+    # ax.set_title('Eye Normal Distribution')
 
-    # 축 및 제목 설정
-    # plt.xlabel('Value')
-    # plt.ylabel('Frequency')
-    # plt.title('eye_normal_distribution')
-    # plt.show()
+    ax.axvline(x=0, color='red', linestyle='--', linewidth=1.5, label='Center (0)', zorder=10)
+
     eye_path = 'C:/Users/USER/Desktop/pjt/API/backend/media/graph/gaze'
     os.makedirs(eye_path, exist_ok=True)
     eye_graph_path = f'{eye_path}/{video_name}'
@@ -513,5 +548,9 @@ def mp_pose_eye_infer(video):
     plt.savefig(eye_graph_path, bbox_inches='tight')
     plt.close()
     eye_graph_image_path = f'graph/gaze/{video_name}'
-    
-    return eye_graph_path + '.png', pose_graph_path + '.png', eye_graph_image_path + '.png', pose_graph_image_path + '.png'
+    print(eye_std, pose_std)
+    return eye_graph_path + '.png', pose_graph_path + '.png', eye_graph_image_path + '.png', pose_graph_image_path + '.png', eye_std, pose_std
+
+
+# a, b, c, d, e ,f = mp_pose_eye_infer('C:/Users/USER/Desktop/pjt/API/backend/media/interview_videos/1/recorded_video_2024-11-14T073101.830Z_1.mp4', 1, 178, 2)
+# print(a)
