@@ -1,5 +1,5 @@
 import { BASE_URL } from '@utils/requestMethods'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import * as a from '@components/analysisdetail/AnalysisDetailSection/AnalysisDetailSection.styled'
 import AnalysisDetailQuestion from '@components/analysisdetail/AnalysisDetailQuestion'
 import AnalysisDetailSynthesis from '@components/analysisdetail/AnalysisDetailSynthesis'
@@ -53,10 +53,12 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
     loadInterviews();
   }, []);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
     <>
       {interviewResults.length > 0 ? (
-        <a.Container>
+        <a.Container ref={containerRef}>
           <a.Title>분석 결과</a.Title>
           <a.SecondTitle>{user.nickname} 님의</a.SecondTitle>
           <a.ThirdTitle>
@@ -90,7 +92,10 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
             {selectedIndex === 0 ?
             <AnalysisDetailSynthesis
               selectedIndex={selectedIndex}
-              data={[interviewResults[selectedIndex]]}/> :
+              data={[interviewResults[selectedIndex]]}
+              setSelectedIndex={setSelectedIndex}
+              containerRef={containerRef} // 전달
+            /> :
             <AnalysisDetailQuestion
               selectedIndex={selectedIndex}
               data={[interviewResults[selectedIndex]]}

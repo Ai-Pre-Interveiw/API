@@ -20,7 +20,29 @@ export const titleDiv = styled.div`
   font-weight: bold;
   font-size: 3vh;
   padding-top: 2vh;
-  padding-bottom: 2vh;
+`
+
+export const contentTitle = styled.button`
+  font-weight: bold;
+  font-size: 3vh;
+  margin-right: 0.5vw;
+`
+
+export const contentWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+`
+
+export const contentWrap1 = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+`
+
+export const content = styled.div`
+  font-weight: bold;
+  font-size: 2.5vh;
 `
 
 export const graphTitle = styled.div`
@@ -32,6 +54,7 @@ export const graphTitle = styled.div`
   padding: 1.5vh;
   font-weight: bold;
   font-size: 2.3vh;
+  margin-top: 3vh;
 `
 
 export const graph = styled.div<{ imageUrl: string }>`
