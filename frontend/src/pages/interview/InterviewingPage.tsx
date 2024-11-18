@@ -12,11 +12,18 @@ import { getInterviewQuestions,
        } from '@/apis/interview'
 import * as i from '@pages/interview/Interviewing.styled'
 import InterviewFooter from '@/components/interview/InterviewFooter'
+import { BASE_URL } from '@/utils/requestMethods'
 
 interface Interview {
   position: string;
   experience_level: string;
   // 다른 필요한 속성들도 여기에 추가하세요.
+}
+
+interface Question {
+  audio_file: string;
+  content: string;
+  // 필요에 따라 다른 속성들도 추가
 }
 
 const Interviewing = () => {
@@ -27,7 +34,7 @@ const Interviewing = () => {
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([])
   const location = useLocation();
   const interviewId = location.state?.interviewId;
-  const [questions, setQuestions] = useState([])
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [interveiw, setInterview] = useState<Interview | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 현재 질문 인덱스 상태 추가
   const [isThinking, setIsThinking] = useState(false);
@@ -37,6 +44,7 @@ const Interviewing = () => {
   const [SixtyCountdown, setSixtyCountdown] = useState(SixtyInitialCountdown); // 카운트다운 상태 추가
   const [ThirtyCountdown, setThirtyCountdown] = useState(ThirtyInitialCountdown); // 카운트다운 상태 추가
   const timerRef = useRef<NodeJS.Timeout | null>(null); // 타이머 레퍼런스
+  const audioRef = useRef<HTMLAudioElement | null>(null); // 오디오 재생을 위한 ref
 
   const questionContent = questions.length > 0 ? [
     {
@@ -45,7 +53,7 @@ const Interviewing = () => {
         '마이크 테스트를 위해 하단의', '시작하기', '버튼을 누르고', '테스트 문장', '을 확인해주세요.',
         '',
         '확인 후', '답변하기', '버튼을 눌러 테스트 문장에 답변 해주시고',
-        '답변을 완료하면 하단에', '답변완료', '버튼을 눌러주세요',
+        '답변을 완료하면 하단에', '답변완료', '버튼을 눌러주세요.',
         '안녕하십니까 지원자 OOO 입니다. 잘 부탁드립니다.'
       ]
     },
@@ -296,18 +304,52 @@ const Interviewing = () => {
     }
   };
 
+  // 오디오 파일 재생 함수
+  const playAudioFile = (audioPath: string) => {
+    console.log('오디오패스요', audioPath)
+    if (audioRef.current) {
+      if (audioPath === 'normal.mp3') {
+        audioRef.current.src = 'normal.mp3';
+        audioRef.current.play().catch((error) => {
+          console.error("오디오 파일 재생 실패:", error);
+        });
+      }
+      else {
+        audioRef.current.src = `${BASE_URL}${audioPath}`;
+        audioRef.current.play().catch((error) => {
+          console.error("오디오 파일 재생 실패:", error);
+        });
+      }
+    }
+  };
+
+// 오디오 재생 중지 함수
+const stopAudio = () => {
+  if (audioRef.current) {
+    audioRef.current.pause(); // 오디오 재생 중지
+    audioRef.current.currentTime = 0; // 재생 위치를 처음으로 되돌림
+  }
+};
+
   const handleThinkingMode = () => {
     setIsThinking(true);
     setIsAnswering(false);
     startThirtyCountdown(30); // 생각하기 모드에서 30초 카운트다운 시작
+    if (questions[currentQuestionIndex - 1]?.audio_file && currentQuestionIndex > 0) {
+      playAudioFile(questions[currentQuestionIndex - 1].audio_file);
+    } else if (currentQuestionIndex !== 0) {
+      playAudioFile('normal.mp3');
+    }
   };
 
   const handleAnswerMode = () => {
     setIsThinking(false);
     setIsAnswering(true);
+    stopAudio();
     startSixtyCountdown(60); // 답변하기 모드에서 60초 카운트다운 시작
     startRecording();
   };
+
 
   const handleAnswerComplete = () => {
     // resetThirtyCountdown();
@@ -316,6 +358,7 @@ const Interviewing = () => {
     stopRecording(); // 녹화 종료
     setSixtyCountdown(60); // 60초로 리셋
     if (currentQuestionIndex < questionContent.length - 1) {
+      stopAudio()
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1); // 다음 질문으로 이동
       setIsThinking(false);
     } else {
@@ -330,6 +373,7 @@ const Interviewing = () => {
   
   return (
     <div>
+      <audio ref={audioRef} /> {/* 오디오 엘리먼트 추가 */}
       {/* <InterviewHeader/> */}
       <i.Container isStart={currentQuestionIndex >= 1}>
         <i.videoWrap isMinimized={!isThinking && !isAnswering}>

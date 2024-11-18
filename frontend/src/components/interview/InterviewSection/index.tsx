@@ -30,7 +30,7 @@ const index = (props: { image: string; texts:string[] }) => {
         </i.connectingTextWrap> :
       image !== '' ?
         <i.TextWrapper key={image}>
-          <i.Text1>{texts[0]}</i.Text1>
+          <i.Text12>{texts[0]}</i.Text12>
           <i.TextWrapper2 key={image}>
             <i.Text2>{texts[1]}</i.Text2>
             <i.Text2>{texts[2]}</i.Text2>

@@ -84,8 +84,16 @@ def face_recognition(video):
     bad_count = sum(1 for label in emo_label_list if label in [2, 3])
 
     total_count = good_count + bad_count
-    good_ratio = round(good_count / total_count * 100) / 100
-    bad_ratio = round(bad_count / total_count * 100) / 100
+
+    if total_count == 0:
+        good_ratio = 0
+        bad_ratio = 0
+    else:
+        good_ratio = round(good_count / total_count * 100) / 100
+        bad_ratio = round(bad_count / total_count * 100) / 100
+    ## 여기서 zerodivision 에러가 나오는데 그러면 good bad를 못잡았단건데 ㅈ댄거 아닌가..?
+    # good_ratio = round(good_count / total_count * 100) / 100
+    # bad_ratio = round(bad_count / total_count * 100) / 100
 
     # # 데이터 및 범주 설정
     # categories = ['','Good', '', 'Bad', '']
@@ -173,4 +181,4 @@ def face_recognition(video):
     plt.savefig(expression_graph_path, bbox_inches='tight')
     plt.close()
 
-    return expression_graph_path + '.png', expression_graph_image_path
+    return expression_graph_path + '.png', expression_graph_image_path, bad_count

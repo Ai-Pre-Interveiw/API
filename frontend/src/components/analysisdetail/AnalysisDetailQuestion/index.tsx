@@ -17,6 +17,7 @@ export interface InterviewResult {
   posture_distribution_path: string;
   voice_distribution_path: string;
   expression_distribution_path: string;
+  answer_text: string[],
   filler_word_positions: string[];
   follow_up_questions: string[];
   created_at: string;
@@ -41,7 +42,8 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
   const anxietyGraphPath = Array.isArray(data) && data.length > 0 ? data[0].anxiety_graph_path : null;
   const voiceGraphPath = Array.isArray(data) && data.length > 0 ? data[0].voice_distribution_path : null;
   const expressionGraphPath = Array.isArray(data) && data.length > 0 ? data[0].expression_distribution_path : null;
-
+  const answerText = Array.isArray(data) && data.length > 0 ? data[0].answer_text : null;
+  const followUp = Array.isArray(data) && data.length > 0 ? data[0].follow_up_questions : null;
   console.log(data);
   console.log(anxietyGraphPath)
   console.log(voiceGraphPath)
@@ -96,7 +98,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
             답변 분석 결과
           </a.titleText>
           <a.script>
-            스크립트 부분
+            {answerText}
           </a.script>
           <a.summaryWrap>
             <a.summary>
@@ -111,7 +113,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
           </a.ToggleButton>
           <a.Content isOpen={isOpen}>
             <a.ContentText>
-              여기에 예상 꼬리질문 내용이 들어갑니다. 추가적인 정보나 질문을 표시하려면 이곳을 사용하세요.
+              {followUp}
             </a.ContentText>
             <a.ContentText>
               여러 줄의 텍스트를 넣을 수 있으며, 확장/축소가 가능합니다.
