@@ -63,6 +63,7 @@ class InterviewResult(models.Model):
     answer_text = models.JSONField(default=list, blank=True)
     filler_word_positions = models.JSONField(default=list, blank=True)  # 미사여구 위치 리스트
     follow_up_questions = models.JSONField(default=list, blank=True)
+    voice_top_indices = models.JSONField(default=list, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)  # 생성 시간
     updated_at = models.DateTimeField(auto_now=True)  # 업데이트 시간

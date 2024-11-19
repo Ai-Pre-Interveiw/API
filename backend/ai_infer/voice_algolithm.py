@@ -123,154 +123,64 @@ class VocalTremorAnalyzer():
         return pd.DataFrame(all_results)
     
 
-def plot_tension_distribution(metrics, metric_names, output_folder, video, color="#9137fc"):
-    video_name = video.split('.')[-2]
-    
-    # 개별 메트릭에 대해 히스토그램 생성
-    for metric, name in zip(metrics, metric_names):
-        counts, bins = np.histogram(metric, bins=20)
-        
-        # 그래프 설정
-        plt.figure(figsize=(8, 5))
-        ax = plt.gca()
-        
-        # 각 빈의 막대 생성
-        for i in range(len(bins) - 1):
-            if counts[i] != 0:
-                x = bins[i]
-                width = bins[i + 1] - bins[i]
-                height = counts[i]
-                rounding_size = height * 0.000125
-                
-                # 둥근 모서리를 가진 막대 생성
-                rect = FancyBboxPatch(
-                    (x, 0), width, height,
-                    boxstyle=f"round,pad=0,rounding_size={rounding_size}",
-                    edgecolor="white", facecolor=color, zorder=5
-                )
-                ax.add_patch(rect)
-
-        # 축 범위 설정
-        ax.set_xlim(bins[0], bins[-1])
-        ax.set_ylim(0, max(counts) + 2)
-
-        # y축 격자 표시
-        plt.grid(axis='y', linestyle='--', alpha=0.5)
-        plt.grid(False, axis='x')
-
-        # 그래프 제목 설정
-        plt.title(f"Distribution of {name}")
-        
-        # 그래프 저장 경로 설정 및 저장
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
-        output_path = f"{output_folder}/{name}_{video_name}.png"
-        plt.savefig(output_path, bbox_inches='tight')
-        plt.close()
-        print(f"Graph saved to {output_path}")
-
-
-def plot_tension_distribution_dual_line(metrics, metric_names, output_folder, video, colors=["#9137fc", "#37fc91"]):
-    video_name = video.split('.')[-2]
-    
-    # 그래프 설정
-    plt.figure(figsize=(10, 6))
-
-    # 각 메트릭에 대해 히스토그램 생성 후 선 그래프 그리기
-    for metric, name, color in zip(metrics, metric_names, colors):
-        counts, bins = np.histogram(metric, bins=20)
-        bin_centers = 0.5 * (bins[1:] + bins[:-1])  # bin 중심값 계산
-
-        # 선 그래프 추가
-        plt.plot(bin_centers, counts, label=name, color=color, marker='o', linestyle='-', linewidth=2, markersize=5)
-
-    # 축 및 제목 설정
-    plt.xlabel("Value")
-    plt.ylabel("Frequency")
-    plt.title(f"Distribution of {metric_names[0]} and {metric_names[1]}")
-    plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.5)
-
-    # 그래프 저장 경로 설정 및 저장
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-    output_path = f"{output_folder}/{metric_names[0]}_{metric_names[1]}_{video_name}.png"
-    plt.savefig(output_path, bbox_inches='tight')
-    plt.close()
-    print(f"Graph saved to {output_path}")
-
 # 선 그래프 그리기
-def plot_tension_distribution_line(metrics, metric_names, output_folder, video, colors="#9137fc"):
+def plot_tension_distribution_line(metrics, metric_names, output_folder, video, emo_label, colors="#9137fc"):
     video_name = video.split('.')[-2]  # 비디오 이름 추출
+    top_indices = []
 
-    # 그래프 설정
-    plt.figure(figsize=(15, 6))
-
-    # 각 메트릭에 대해 선 그래프 생성
     for i, (metric, name) in enumerate(zip(metrics, metric_names)):
-        plt.plot(metric, label=name, color=colors, marker='o', linestyle='-')
+        
+        # 모든 metrics에 scaled_metric 적용
+        scaled_metric = [
+            val * 1.2 if label == "bad" else val
+            for val, label in zip(metric, emo_label)
+        ]
 
-    # 축 및 제목 설정
-    # plt.xlabel("Sample Index")
-    # plt.ylabel("Value")
-    # plt.title(f"{metric_names[0]} Comparison")
-    # plt.legend()
-    plt.grid(True, linestyle="--", alpha=0.5)
+        if name == "Entropy Std":
+            top_indices = [idx for idx, _ in sorted(enumerate(scaled_metric), key=lambda x: x[1], reverse=True)[:2]]
 
-    # 그래프 저장 경로 생성 및 저장
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-    output_path = f"{output_folder}/{metric_names[0]}_{video_name}.png"
-    plt.savefig(output_path, bbox_inches='tight')
-    plt.close()
-    print(f"Graph saved to {output_path}")
+        
+        plt.figure(figsize=(15, 6))
+        plt.plot(scaled_metric, label=name, color=colors, marker='o', linestyle='-')
+  
+        # 특정 지표(`entropy_std`)에만 일반적인 감정 상태 범위를 시각화
+        if name == "Entropy Std":
+            plt.axhspan(0.0, 0.1, color="blue", alpha=0.1, label="Depressed/Fatigue (0.1 or below)")
+            plt.axhspan(0.1, 0.2, color="green", alpha=0.1, label="Calm/Neutral (0.2 or below)")
+            plt.axhspan(0.5, 1.0, color="red", alpha=0.1, label="Strong Emotion (0.5 or above)")
 
-    return output_path, f'graph/anxiety/{metric_names[0]}_{video_name}.png'
-
-
-def plot_tension_distribution_entropy(metric, metric_names, output_folder, video, color="#9137fc"):
-    video_name = video.split('.')[-2]
-    
-    # 개별 메트릭에 대해 히스토그램 생성
-
-    counts, bins = np.histogram(metric, bins=20)
-    
-    # 그래프 설정
-    plt.figure(figsize=(8, 5))
-    ax = plt.gca()
-    
-    # 각 빈의 막대 생성
-    for i in range(len(bins) - 1):
-        if counts[i] != 0:
-            x = bins[i]
-            width = bins[i + 1] - bins[i]
-            height = counts[i]
-            rounding_size = height * 0.000125
+        if name == "Frequency Variation":
+            plt.axhspan(2, 5, color="green", alpha=0.1, label="Calm/Neutral (2 ~ 5)")
             
-            # 둥근 모서리를 가진 막대 생성
-            rect = FancyBboxPatch(
-                (x, 0), width, height,
-                boxstyle=f"round,pad=0,rounding_size={rounding_size}",
-                edgecolor="white", facecolor=color, zorder=5
-            )
-            ax.add_patch(rect)
+        # 축 및 제목 설정
+        plt.grid(True, linestyle="--", alpha=0.5)
+        # plt.legend(loc="upper left")
 
-    # 축 범위 설정
-    ax.set_xlim(bins[0], bins[-1])
-    ax.set_ylim(0, max(counts) + 2)
-
-    # y축 격자 표시
-    plt.grid(axis='y', linestyle='--', alpha=0.5)
-    plt.grid(False, axis='x')
-
-    # 그래프 제목 설정
-    # plt.title(f"Distribution of {metric_names}")
+        # ent_output_path = ''
+        # ent_output_db_path = ''
+        if name == "Entropy Std":
+            print('엔트로피요~~~~~~~~~~~')
+            output_path_ent = f'C:/Users/USER/Desktop/pjt/API/backend/media/graph/anxiety'
+            os.makedirs(output_path_ent, exist_ok=True)
+            ent_output_graph_path = f'{output_path_ent}/{name}_{video_name}'
+            ent_output_path = ent_output_graph_path
+            ent_output_db_path = f'graph/anxiety/{name}_{video_name}.png'
+            plt.savefig(ent_output_graph_path, bbox_inches='tight')
+            plt.close()
+            # print(f"Graph saved to {output_path}")
+        # fre_output_path = ''
+        # fre_output_db_path = ''
+        if name == "Frequency Variation":
+            print('프리퀀시요~~~~~~~~~~')
+            output_path_fre = f"C:/Users/USER/Desktop/pjt/API/backend/media/graph/voice"
+            os.makedirs(output_path_fre, exist_ok=True)
+            fre_output_graph_path = f'{output_path_fre}/{name}_{video_name}'
+            fre_output_path = fre_output_graph_path
+            fre_output_db_path = f'graph/voice/{name}_{video_name}.png'
+            plt.savefig(fre_output_graph_path, bbox_inches='tight')
+            plt.close()
+            # print(f"Graph saved to {output_path}")
     
-    # 그래프 저장 경로 설정 및 저장
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-    output_path = f"{output_folder}/{metric_names[0]}_{video_name}.png"
-    plt.savefig(output_path, bbox_inches='tight')
-    plt.close()
-    print(f"Graph saved to {output_path}")
-    return output_path, f'graph/voice/{metric_names[0]}_{video_name}.png'
+    # print('아웃풋 패쓰 리스트', output_path_list)
+    # print('아웃풋 패쓰 디비리스트', output_path_db_list)
+    return ent_output_path + '.png', fre_output_path + '.png', ent_output_db_path, fre_output_db_path, top_indices

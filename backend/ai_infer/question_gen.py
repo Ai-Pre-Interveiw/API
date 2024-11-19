@@ -82,34 +82,6 @@ def parse_questions(content):
         })
     return questions
 
-# Function to select best questions
-def select_best_questions(questions_by_type):
-    final_best_questions = []
-    # For '직무 역량 관련 질문' and '기본 직무 역량 관련 질문', pick 2 each
-    for qtype in ['직무 역량 질문', '기초 역량 질문', '기술 역량 질문', '기본 직무 역량 질문']:
-        qs = questions_by_type.get(qtype, [])
-        # Remove selected questions from the list after adding
-        for _ in range(2):
-            if not qs:
-                break
-            best_q = max(qs, key=lambda x: len(x['question']))
-            final_best_questions.append(best_q)
-            qs.remove(best_q)
-    # For '인성 질문' and '돌발 질문', pick 1 each
-    for qtype in ['인성 질문', '돌발 질문']:
-        qs = questions_by_type.get(qtype, [])
-        if qs:
-            best_q = max(qs, key=lambda x: len(x['question']))
-            final_best_questions.append(best_q)
-            qs.remove(best_q)
-    # If we have less than 6 questions, fill with '기타 질문'
-    if len(final_best_questions) < 6:
-        qs = questions_by_type.get('기타 질문', [])
-        while len(final_best_questions) < 6 and qs:
-            best_q = max(qs, key=lambda x: len(x['question']))
-            final_best_questions.append(best_q)
-            qs.remove(best_q)
-    return final_best_questions
 
 def get_question(entry_or_experienced, job, resume):
     # 각 폴더의 FAISS 인덱스를 로드
@@ -120,7 +92,7 @@ def get_question(entry_or_experienced, job, resume):
     # 모델 초기화 (온도 설정 동일)
     fixed_model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     # 질문 생성 체인에서는 temperature를 높임
-    random_model = ChatOpenAI(model="gpt-4o-mini", temperature=0.9)
+    random_model = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 
     # 두 번째 체인: 강점 및 약점 분석
     strengths_weaknesses_prompt = PromptTemplate(
@@ -161,8 +133,14 @@ def get_question(entry_or_experienced, job, resume):
     question_prompt = PromptTemplate(
         input_variables=["doc_text", "guideline_texts", "strengths_weaknesses", "real_experiences", "applicant_info"],
         template=""" 
-        다음 자기소개서의 내용을 바탕으로, 지원자의 직종, 경력 상태, 강점, 약점, 실무 경험 및 학문적 경험을 종합하여 6개의 질문을 생성해 주세요.
-        각 질문에는 반드시 관련된 가이드라인 내용을 참고하여 근거를 작성해 주세요.
+        다음 자기소개서의 내용을 바탕으로, 지원자의 직종, 경력 상태, 강점, 약점, 실무 경험 및 학문적 경험을 모두 참고하여 가이드라인에 따라 6개의 질문을 생성해 주세요.
+        질문은 반드시 가이드라인 내용을 참고하여 근거를 생성해 주세요.
+
+        질문 구성:
+        - 직무 역량 관련 질문 2개
+        - 기본 직무 역량 관련 질문 2개
+        - 인성 질문 1개
+        - 돌발 질문 1개
 
         지원자 정보:
         {applicant_info}
@@ -212,7 +190,6 @@ def get_question(entry_or_experienced, job, resume):
     # 자기소개서 텍스트 로드 및 분할
     loader = PyPDFLoader(f"C:/Users/USER/Desktop/pjt/API/backend/media/resume/{resume}")
     doc_lst = loader.load_and_split()  # 페이지별로 텍스트 분할
-    response_lst = []
 
     # 가이드라인 내용 검색 및 트렁케이션
     guideline_text = truncate_text(search_across_all_stores("핵심 평가 요소 질문 생성 지침"))
@@ -245,46 +222,27 @@ def get_question(entry_or_experienced, job, resume):
     # 관련 텍스트 검색 및 길이 제한
     related_text = truncate_text(search_across_all_stores(all_doc_text))
 
-    # 질문 세트 4개 생성
-    response_lst = []
-    for _ in range(4):
-        # 다섯 번째 체인 실행: 질문 생성 (6개의 질문을 생성)
-        question_response = question_chain.invoke({
-            "doc_text": all_doc_text, 
-            "guideline_texts": guideline_text + "\n\n" + related_text,
-            "applicant_info": [entry_or_experienced, job],  # applicant_info는 question_chain 내부에서 추출
-            "strengths_weaknesses": strengths_weaknesses_response,
-            "real_experiences": real_experiences_response
-        })
+    # 질문 생성 (단일 세트)
+    question_response = question_chain.invoke({
+        "doc_text": all_doc_text, 
+        "guideline_texts": guideline_text + "\n\n" + related_text,
+        "applicant_info": None,
+        "strengths_weaknesses": strengths_weaknesses_response,
+        "real_experiences": real_experiences_response
+    })
 
-        # 결과 저장
-        response_lst.append((question_response, strengths_weaknesses_response, real_experiences_response))
-
-    # 결과 출력 (6개의 질문을 포함한 4개의 질문 세트)
-    for i, (question_response, strengths_weaknesses_response, real_experiences_response) in enumerate(response_lst, 1):
-        print(f"\nResponse Set {i} (질문 생성):\n{question_response.content}\n{'-'*30}\n")
-
-    # Collect all questions from response_lst
-    all_questions = []
-    for response in response_lst:
-        content = response[0].content
-        questions = parse_questions(content)
-        all_questions.extend(questions)
-
-    # Group questions by type
-    questions_by_type = {}
-    for q in all_questions:
-        qtype = q['type']
-        questions_by_type.setdefault(qtype, []).append(q)
-
-
-    # Get the final best questions
-    best_questions = select_best_questions(questions_by_type)
+    questions = parse_questions(question_response.content)
+    print("\nParsed Questions:\n")
+    for q in questions:
+        print(f"Question {q['number']}:")
+        print(f"Type: {q['type']}")
+        print(f"Question: {q['question']}")
+        print(f"Ground: {q['ground']}")
+        print('-'*30)
 
     result = ['1분 자기소개를 해주세요.']
     # Print the best questions
-    print("\nBest Questions Set by Type (6 questions):\n")
-    for i, q in enumerate(best_questions, 1):
+    for i, q in enumerate(questions, 1):
         if i == 7:
             break
         else:

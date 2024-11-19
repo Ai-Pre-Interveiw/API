@@ -468,6 +468,10 @@ def mp_pose_eye_infer(video, question_id, first_angle, standard_eye):
     bin_centers = 0.5 * (pose_bins[:-1] + pose_bins[1:])  # 각 bin의 중심값 계산
     plt.bar(bin_centers, pose_counts, width=(pose_bins[1] - pose_bins[0]), color="#9137fc", edgecolor="white", zorder=5)
 
+    # 0값 기준으로 +-25% 영역 표시
+    threshold = 0.25 * (max(pose_data) - min(pose_data))
+    plt.axvspan(xmin=-threshold, xmax=threshold, color='gray', alpha=0.3, zorder=1, label='+/- 25%')
+
     # 축 범위 설정 (0을 중앙값으로 대칭 범위 설정)
     xmin, xmax = min(pose_data), max(pose_data)
     max_abs = max(abs(xmin), abs(xmax))  # 0 기준 대칭 범위 계산
@@ -524,6 +528,10 @@ def mp_pose_eye_infer(video, question_id, first_angle, standard_eye):
     bin_centers = 0.5 * (eye_bins[:-1] + eye_bins[1:])  # 각 bin의 중심값 계산
     plt.bar(bin_centers, eye_counts, width=(eye_bins[1] - eye_bins[0]), color="#9137fc", edgecolor="white", zorder=5)
     
+    # 0값 기준으로 +-25% 영역 표시
+    threshold = 0.25 * (max(eye_data) - min(eye_data))
+    plt.axvspan(xmin=-threshold, xmax=threshold, color='gray', alpha=0.3, zorder=1, label='+/- 25%')
+
     # 정규분포 곡선 추가
     xmin, xmax = min(eye_data), max(eye_data)
     # x = np.linspace(xmin, xmax, 100)
@@ -548,7 +556,7 @@ def mp_pose_eye_infer(video, question_id, first_angle, standard_eye):
     plt.savefig(eye_graph_path, bbox_inches='tight')
     plt.close()
     eye_graph_image_path = f'graph/gaze/{video_name}'
-    print(eye_std, pose_std)
+    # print(eye_std, pose_std)
     return eye_graph_path + '.png', pose_graph_path + '.png', eye_graph_image_path + '.png', pose_graph_image_path + '.png', eye_std, pose_std
 
 
