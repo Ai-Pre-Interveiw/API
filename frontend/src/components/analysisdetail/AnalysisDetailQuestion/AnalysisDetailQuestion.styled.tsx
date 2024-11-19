@@ -103,7 +103,7 @@ export const ToggleButton = styled.div`
   cursor: pointer;
   font-size: 2.2vh;
   font-weight: bold;
-  width: 12vw;
+  width: 30vw;
   transition: transform 0.05s ease; // 부드러운 전환 효과 추가
 
   &:hover {

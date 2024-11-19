@@ -56,4 +56,6 @@ class InterviewResultSerializer(serializers.ModelSerializer):
                   'expression_distribution_path',
                   'answer_text',
                   'follow_up_questions',
-                  'filler_word_positions',]
+                  'filler_word_positions',
+                  'voice_top_indices',
+                  ]

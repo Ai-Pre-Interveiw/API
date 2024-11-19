@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from ai_infer.Pose_Eye_mp_Final import mp_pose_eye_infer
 from ai_infer.emotion_4_class_recognition import face_recognition
-from ai_infer.voice_algolithm import extract_audio_from_video, VocalTremorAnalyzer, plot_tension_distribution_entropy, plot_tension_distribution_line
+from ai_infer.voice_algolithm import extract_audio_from_video, VocalTremorAnalyzer, plot_tension_distribution_line
 from ai_infer.STT_infer import stt_result
 from ai_infer.question_result import search_and_generate_comment
 from ai_infer.sketch_synthesis import sketch_synthesis
@@ -41,6 +41,8 @@ def inference_eye_pose(request, interview_id):
     processed_videos = []
     standard_angle = 0
     standard_eye = 0
+    standard_emotion = 0
+    emotion_labels = []
 
     eye_graph_path = ''
     pose_graph_path= ''
@@ -73,18 +75,20 @@ def inference_eye_pose(request, interview_id):
                     question = Question.objects.get(id=question_id)
                     interview_result = InterviewResult.objects.get(interview=interview, question=question)
 
-                    print(standard_angle)
-                    print(standard_eye)
+                    print(standard_emotion)
                     # mp_pose_eye_infer 함수로 그래프 이미지 경로 생성
                     if question_id % 8 == 0:
                         standard_angle, standard_eye = mp_pose_eye_infer(video_path, question_id, standard_angle, standard_eye)
+                        standard_emotion = face_recognition(video_path, question_id, standard_emotion)
                     else:
                         eye_graph_path, pose_graph_path, eye_graph_image_path, pose_graph_image_path, eye_std, pose_std = mp_pose_eye_infer(video_path, question_id, standard_angle, standard_eye)
+                        exp_graph_output_path, exp_graph_path, bad_emotion, emo_label = face_recognition(video_path, question_id, standard_emotion)
                         eye_synthesis.append(eye_std)
                         pose_synthesis.append(pose_std)
-
-                    exp_graph_output_path, exp_graph_path, bad_count = face_recognition(video_path)
-                    exp_synthesis.append(bad_count)
+                        exp_synthesis.append(bad_emotion)
+                        emotion_labels.append(emo_label)
+                    
+                    
 
                     print(f'여기인가 {eye_graph_path}')
                     print(f'아님여기 {eye_graph_image_path}')
@@ -134,30 +138,32 @@ def inference_eye_pose(request, interview_id):
     voice_emotion = VocalTremorAnalyzer()
     for idx, wav_file in enumerate(os.listdir(wav_folder)):
         wav_path = f"{wav_folder}/{wav_file}"
-        
+        print(len(emotion_labels), idx)
+        print(emotion_labels)
+        print(emotion_labels[idx - 1])
         # `analyze_wav_files`의 첫 번째 결과를 가져와 각 메트릭 값을 추출
         voice_result = voice_emotion.analyze_wav_files([wav_path])
 
         # voice_result에서 각 메트릭 추출
-
-        freq_std = voice_result['freq_std']
-        # freq_variation = voice_result['freq_variation']
+        # print(voice_result)
+        # freq_std = voice_result['freq_std']
+        freq_variation = voice_result['freq_variation']
         # modulation_index = voice_result['modulation_index']
-        # entropy_std = voice_result['entropy_std']
-        entropy_rate = voice_result['entropy_rate']
+        entropy_std = voice_result['entropy_std']
+        # entropy_rate = voice_result['entropy_rate']
 
 
         # 각 메트릭에 대해 그래프 생성
         # metrics = [freq_std, freq_variation, modulation_index, entropy_std, entropy_rate]
         # metric_names = ["Frequency Std", "Frequency Variation", "Modulation Index", "Entropy Std", "Entropy Rate"]
-        line_metrics = [freq_std]
-        line_metric_names = ['Frequency Std']
-        ent_rate_metrics = [entropy_rate]
-        ent_rate_metrics_names = ['Entropy Rate']
+        line_metrics = [entropy_std, freq_variation]
+        line_metric_names = ['Entropy Std', 'Frequency Variation']
         # plot_tension_distribution(metrics, metric_names, output_folder=wav_plt_folder, video=wav_file)
-        anxiety_graph_output_path, anxiety_graph_path = plot_tension_distribution_line(line_metrics, line_metric_names, output_folder=anxiety_folder, video=wav_file)
-        voice_graph_output_path, voice_graph_path = plot_tension_distribution_entropy(ent_rate_metrics, ent_rate_metrics_names, output_folder=voice_plt_folder, video=wav_file)
-        
+        anxiety_graph_output_path, voice_graph_output_path, anxiety_graph_path, voice_graph_path, voice_top_indices = plot_tension_distribution_line(line_metrics, line_metric_names, output_folder=anxiety_folder, video=wav_file, emo_label=emotion_labels[idx - 1])
+        print('긴장도그래프 저장 경로', anxiety_graph_output_path)
+        print('목소리그래프 저장 경로', voice_graph_output_path)
+        print('긴장도 db 경로', anxiety_graph_path)
+        print('목소리 db 경로', voice_graph_path)
         text_result = stt_result(wav_path)
 
         try:
@@ -175,7 +181,7 @@ def inference_eye_pose(request, interview_id):
             print(f'답변 리스트: {text_result}')
             tail_question = ''
             if question_content != 'test':
-                tail_question = search_and_generate_comment(question=question_content, answer=text_result)
+                tail_question, generated_comment = search_and_generate_comment(question=question_content, answer=text_result)
 
             # 파일이 생성된 경우에만 업데이트
             if os.path.exists(anxiety_graph_output_path) and os.path.exists(voice_graph_output_path) and question_id % 8 != 0:
@@ -184,7 +190,8 @@ def inference_eye_pose(request, interview_id):
                 interview_result.voice_distribution_path = voice_graph_path
                 interview_result.follow_up_questions = tail_question
                 interview_result.answer_text = text_result
-
+                interview_result.voice_top_indices = voice_top_indices
+                interview_result.filler_word_positions = generated_comment
             # 모델 저장
             interview_result.save()
 

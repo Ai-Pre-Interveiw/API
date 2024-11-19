@@ -233,9 +233,53 @@ def search_and_generate_comment(question, answer, top_k=1):
         tail_questions_response = llm(tail_prompt)
         tail_questions = tail_questions_response.content
         # return '성공'
-        return tail_questions
+        return tail_questions, generated_comment
     else:
-        return "유사한 코멘트가 없어 꼬리질문을 찾을 수 없습니다."
+        prompt = f"""
+        다음은 다양한 면접 자기소개서에서 추출한 데이터로, 현재 지원자가 면접에서 받은 질의응답과 가장 유사한 질문-답변-코멘트 세트 입니다:
+        질문: {q1}
+        답변: {a1}
+        좋은점: {g1}
+        아쉬운점: {b1}
+
+        질문: {q2}
+        답변: {a2}
+        좋은점: {g2}
+        아쉬운점: {b2}
+
+        질문: {q3}
+        답변: {a3}
+        좋은점: {g3}
+        아쉬운점: {b3}
+
+        질문: {q4}
+        답변: {a4}
+        좋은점: {g4}
+        아쉬운점: {b4}
+
+        질문: {q5}
+        답변: {a5}
+        좋은점: {g5}
+        아쉬운점: {b5}
+        
+        NaN은 좋은점 또는 아쉬운점이 없다는 뜻 입니다.
+        생성될 코멘트들은 지원자의 답변에 대한 꼬리질문 생성을 위해 참고자료로 쓰일 코멘트이니, 코멘트를 통해 키워드가 아닌 의미상의 꼬리질문을 생성할 수 있도록
+        샘플 5개를 Few shot learning 한 후, 지원자의 질의응답을 바탕으로 코멘트를 생성하세요.
+        질문: {question}
+        답변: {answer}
+        
+        답변에 대해 좋은점이 없다고 생각되면 NaN을 출력하세요.
+        답변에 대해 아쉬운점이 없다고 생각되면 NaN을 출력하세요.
+
+        좋은점:
+        아쉬운점:
+        """
+        
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+        response = llm(prompt)
+        generated_comment = response.content
+        
+        return "유사한 코멘트가 없어 꼬리질문을 찾을 수 없습니다.", generated_comment
 
 # # 예시 질문과 답변
 # question = '상사가 부당한 지시를 한다면 어떻게 대처할 것인가요?'

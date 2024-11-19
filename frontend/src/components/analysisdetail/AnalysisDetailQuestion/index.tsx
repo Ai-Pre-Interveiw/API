@@ -18,12 +18,13 @@ export interface InterviewResult {
   voice_distribution_path: string;
   expression_distribution_path: string;
   answer_text: string[],
-  filler_word_positions: string[];
+  filler_word_positions: string;
   follow_up_questions: string[];
   created_at: string;
   updated_at: string;
   interview: number;
   question_detail: {content: string};
+  voice_top_indices: number[],
 }
 
 interface AnalysisDetailQuestionProps {
@@ -44,9 +45,26 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
   const expressionGraphPath = Array.isArray(data) && data.length > 0 ? data[0].expression_distribution_path : null;
   const answerText = Array.isArray(data) && data.length > 0 ? data[0].answer_text : null;
   const followUp = Array.isArray(data) && data.length > 0 ? data[0].follow_up_questions : null;
-  console.log(data);
-  console.log(anxietyGraphPath)
-  console.log(voiceGraphPath)
+  const voiceIndices = Array.isArray(data) && data.length > 0 ? data[0].voice_top_indices : null;
+  const fillerWord = Array.isArray(data) && data.length > 0 ? data[0].filler_word_positions : null;
+  
+  const first_voice = voiceIndices?.[0]
+  const second_voice = voiceIndices?.[1]
+
+  // "좋은점"과 "아쉬운점" 분리
+  const positiveFeedback = fillerWord?.includes("좋은점:") 
+    ? fillerWord.split("아쉬운점:")[0].replace("좋은점:", "").trim()
+    : "";
+  const negativeFeedback = fillerWord?.includes("아쉬운점:")
+    ? fillerWord.split("아쉬운점:")[1].trim()
+    : "";
+
+  console.log(fillerWord)
+  console.log(positiveFeedback)
+  console.log(negativeFeedback)
+  // console.log(data);
+  // console.log(anxietyGraphPath)
+  // console.log(voiceGraphPath)
 
   // PDF 다운로드 함수
   const downloadPDF = async () => {
@@ -91,7 +109,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               질문에 대한 긴장도 분석 결과입니다.
             </a.summary>
             <a.summary>
-              긴장도 최고치는 BACKEND초와 BACKEND초 였습니다. 영상을 확인하고 이유와 원인을 찾아보세요.
+              긴장도 최고치는 {first_voice}초와 {second_voice}초 였습니다. 영상을 확인하고 이유와 원인을 찾아보세요.
             </a.summary>
           </a.summaryWrap>
           <a.titleText>
@@ -101,12 +119,18 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
             {answerText}
           </a.script>
           <a.summaryWrap>
-            <a.summary>
-              질문 {selectedIndex + 1}에 대한 답변의 적절성은 BACKEND 입니다.
-            </a.summary>
-            <a.summary>
-              꼬리질문 생성 가능성 높음의 키워드가 BACKEND건 발견 되었습니다.
-            </a.summary>
+            {positiveFeedback !== 'NaN' ?
+              <a.summary>
+                좋은점 : {positiveFeedback}
+              </a.summary>:
+              <div></div>
+            }
+            {negativeFeedback !== 'NaN' ?
+              <a.summary>
+                아쉬운점 : {negativeFeedback}
+              </a.summary>:
+              <div></div>
+            }
           </a.summaryWrap>
           <a.ToggleButton onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? '▲' : '▼'} 예상 꼬리질문 보러가기
@@ -115,18 +139,7 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
             <a.ContentText>
               {followUp}
             </a.ContentText>
-            <a.ContentText>
-              여러 줄의 텍스트를 넣을 수 있으며, 확장/축소가 가능합니다.
-            </a.ContentText>
           </a.Content>
-          <a.summaryWrap>
-            <a.summary>
-              어, 음 등의 반복어가 BACKEND건 발견되었습니다.
-            </a.summary>
-            <a.summary>
-              답변에 신중하신 것은 좋지만 지나친 미사여구는 면접에 불이익이 될 수 있습니다.
-            </a.summary>
-          </a.summaryWrap>
           <a.grapBigWrap>
             <a.graphWrap>
               <a.graphTitle>
