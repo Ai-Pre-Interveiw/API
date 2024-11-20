@@ -6,7 +6,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 335vh;
+  height: 310vh;
   padding-left: 1%;
   padding-right: 1%;
   overflow: hidden;
@@ -75,6 +75,18 @@ export const nervousGraph = styled.div<{ imageUrl: string }>`
   background-size: 90%;
   background-repeat: no-repeat;
   background-position: center;
+`
+
+export const newSummaryWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`
+
+export const graphSummary = styled.div`
+  font-size: 1.8vh;
+  font-weight: bold;
+  margin-right: 1vw;
 `
 
 export const summaryWrap = styled.div`
@@ -174,5 +186,7 @@ export const graphSummaryWrap = styled.div`
   margin-left: 1vw;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.7vh;
+  align-items: center;
 `

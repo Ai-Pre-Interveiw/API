@@ -151,7 +151,8 @@ def inference_eye_pose(request, interview_id):
         # modulation_index = voice_result['modulation_index']
         entropy_std = voice_result['entropy_std']
         # entropy_rate = voice_result['entropy_rate']
-
+        print('프리크배리에이션', freq_variation)
+        print('엔트로피에스티디', entropy_std)
 
         # 각 메트릭에 대해 그래프 생성
         # metrics = [freq_std, freq_variation, modulation_index, entropy_std, entropy_rate]

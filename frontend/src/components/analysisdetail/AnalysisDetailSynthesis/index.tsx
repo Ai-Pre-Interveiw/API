@@ -81,30 +81,41 @@ const AnalysisDetailSynthesis: React.FC<AnalysisDetailSynthesisProps> = ({ selec
       <a.titleDiv>
         {user.nickname} 님의 모의면접 종합분석 결과 입니다.
       </a.titleDiv>
+      <a.subTitleDiv>
+        그래프 수치가 높을 수록 각 지표가 불안정함을 나타냅니다.
+      </a.subTitleDiv>
+      <a.subTitleDiv2>
+        이 수치는 절대적인 수치가 아닌 회원님의 면접결과에 대한 상대적인 수치를 나타냅니다.
+      </a.subTitleDiv2>
       <a.graphTitle>
         질문 별 시선 분포 분석 결과
       </a.graphTitle>
       <a.graph imageUrl={`${BASE_URL}${gazeGraphPath}`}/>
       <a.contentWrap1>
-        <a.contentWrap>
-          {first_gaze !== 0 ?
-            <a.contentTitle onClick={() => handleQuestionClick(first_gaze as number)}>
-              {first_gaze}번 질문
-            </a.contentTitle>
-            :
-            <div></div>
-          }
-          {second_gaze !== 0 ?
-            <a.contentTitle onClick={() => handleQuestionClick(second_gaze as number)}>
-              {second_gaze}번 질문
-            </a.contentTitle>
-            :
-            <div></div>
-          }
-          <a.content>
-            에서 가장 분포가 고르지 못하게 나타났습니다.
-          </a.content>
-        </a.contentWrap>
+        <a.contentWrap2>
+          <a.contentWrap>
+            {first_gaze !== 0 ?
+              <a.contentTitle onClick={() => handleQuestionClick(first_gaze as number)}>
+                {first_gaze}번 질문
+              </a.contentTitle>
+              :
+              <div></div>
+            }
+            {second_gaze !== 0 ?
+              <a.contentTitle onClick={() => handleQuestionClick(second_gaze as number)}>
+                {second_gaze}번 질문
+              </a.contentTitle>
+              :
+              <div></div>
+            }
+            <a.content>
+              에서 가장 분포가 고르지 못하게 나타났습니다.
+            </a.content>
+          </a.contentWrap>
+          <a.subTitleDiv>
+            O번 질문 버튼을 누르면 해당 질문 상세페이지로 이동합니다.
+          </a.subTitleDiv>
+        </a.contentWrap2>
         <a.content>
           질문의 의도를 잘 파악하고 다시한번 연습해보세요!
         </a.content>

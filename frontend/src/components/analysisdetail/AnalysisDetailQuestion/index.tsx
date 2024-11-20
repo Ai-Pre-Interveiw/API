@@ -104,14 +104,19 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               <a.nervousGraph imageUrl={`${BASE_URL}${anxietyGraphPath}`}>
               </a.nervousGraph>
           </a.videoGraphWrap>
-          <a.summaryWrap>
-            <a.summary>
-              질문에 대한 긴장도 분석 결과입니다.
-            </a.summary>
-            <a.summary>
-              긴장도 최고치는 {first_voice}초와 {second_voice}초 였습니다. 영상을 확인하고 이유와 원인을 찾아보세요.
-            </a.summary>
-          </a.summaryWrap>
+          <a.newSummaryWrap>
+            <a.summaryWrap>
+              <a.summary>
+                질문에 대한 긴장도 분석 결과입니다.
+              </a.summary>
+              <a.summary>
+                긴장도 최고치는 {first_voice}초와 {second_voice}초 였습니다. 영상을 확인하고 이유와 원인을 찾아보세요.
+              </a.summary>
+            </a.summaryWrap>
+            <a.graphSummary>
+              ※ 그래프가 녹색 구역을 벗어나 높아질 수록 긴장했다는 것을 의미합니다.
+            </a.graphSummary>
+          </a.newSummaryWrap>
           <a.titleText>
             답변 분석 결과
           </a.titleText>
@@ -149,13 +154,10 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>
-                  시선이 평균에 벗어나는 빈도수가 많습니다.
+                  그래프가 녹색영역에 집중되어 있다면
                 </a.summary>
                 <a.summary>
-                  실제로 면접관의 눈을 본다고 생각하고 면접에 임해주세요.
-                </a.summary>
-                <a.summary>
-                  시선을 회피하면 면접관은 면접자가 자신감이 없다고 생각합니다.
+                  시선을 한 곳에 집중하여 답변 했다는 것을 의미합니다.
                 </a.summary>
               </a.graphSummaryWrap>
             </a.graphWrap>
@@ -167,10 +169,10 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>
-                  자세의 분포가 아주 좋습니다.
+                  그래프가 녹색영역에 집중되어 있다면
                 </a.summary>
                 <a.summary>
-                  꾸준히 노력하여 좋은 자세로 면접에 임해주세요.
+                  바른 자세로 움직이지 않고 답변 했다는 것을 의미합니다.
                 </a.summary>
               </a.graphSummaryWrap>
             </a.graphWrap>
@@ -184,10 +186,10 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>
-                  목소리의 분포가 아주 좋습니다.
+                  그래프가 녹색 범위를 벗어나 위로 상승하면
                 </a.summary>
                 <a.summary>
-                  꾸준히 노력하여 좋은 목소리로 면접에 임해주세요.
+                  답변 목소리의 긴장도가 높아졌음을 의미합니다.
                 </a.summary>
               </a.graphSummaryWrap>
             </a.graphWrap>
@@ -199,10 +201,10 @@ const AnalysisDetailQuestion: React.FC<AnalysisDetailQuestionProps> = ({ selecte
               </a.graph>
               <a.graphSummaryWrap>
                 <a.summary>
-                  표정의 분포가 아주 좋습니다.
+                  점선은 표정의 평균 긴장 정도 입니다.
                 </a.summary>
                 <a.summary>
-                  꾸준히 노력하여 좋은 표정로 면접에 임해주세요.
+                  점선을 벗어나 수치가 많이 올라간다면 표정의 긴장도가 높아졌음을 의미합니다.
                 </a.summary>
               </a.graphSummaryWrap>
             </a.graphWrap>

@@ -470,7 +470,7 @@ def mp_pose_eye_infer(video, question_id, first_angle, standard_eye):
 
     # 0값 기준으로 +-25% 영역 표시
     threshold = 0.25 * (max(pose_data) - min(pose_data))
-    plt.axvspan(xmin=-threshold, xmax=threshold, color='gray', alpha=0.3, zorder=1, label='+/- 25%')
+    plt.axvspan(xmin=-threshold, xmax=threshold, color='green', alpha=0.1, zorder=1, label='+/- 25%')
 
     # 축 범위 설정 (0을 중앙값으로 대칭 범위 설정)
     xmin, xmax = min(pose_data), max(pose_data)
@@ -530,7 +530,7 @@ def mp_pose_eye_infer(video, question_id, first_angle, standard_eye):
     
     # 0값 기준으로 +-25% 영역 표시
     threshold = 0.25 * (max(eye_data) - min(eye_data))
-    plt.axvspan(xmin=-threshold, xmax=threshold, color='gray', alpha=0.3, zorder=1, label='+/- 25%')
+    plt.axvspan(xmin=-threshold, xmax=threshold, color='green', alpha=0.1, zorder=1, label='+/- 25%')
 
     # 정규분포 곡선 추가
     xmin, xmax = min(eye_data), max(eye_data)
