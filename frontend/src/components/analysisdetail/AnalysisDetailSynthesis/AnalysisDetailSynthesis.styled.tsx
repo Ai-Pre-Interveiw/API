@@ -22,6 +22,17 @@ export const titleDiv = styled.div`
   padding-top: 2vh;
 `
 
+export const subTitleDiv = styled.div`
+  font-weight: bold;
+  font-size: 2vh;
+  margin-top: 1.5vh;
+`
+export const subTitleDiv2 = styled.div`
+  font-weight: bold;
+  font-size: 2vh;
+  margin-top: 0.5vh;
+`
+
 export const contentTitle = styled.button`
   font-weight: bold;
   font-size: 3vh;
@@ -38,6 +49,14 @@ export const contentWrap1 = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1vh;
+`
+
+export const contentWrap2 = styled.div`
+  display: flex;
+  flex-direction: row;
+  // background-color: yellow;
+  justify-content: space-between;
+  align-items: end;
 `
 
 export const content = styled.div`

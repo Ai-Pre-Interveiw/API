@@ -197,7 +197,7 @@ export const inferenceEyePose = async (interviewId : number) => {
     // Django 서버의 URL 경로
     const response = await axios.post(`${BASE_URL}/inference/${interviewId}/`,
       {},
-      { timeout: 1800000,
+      { timeout: 3600000,
         headers: {
           'X-CSRFToken': csrfToken,
         },

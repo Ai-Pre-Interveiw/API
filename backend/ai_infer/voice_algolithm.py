@@ -36,28 +36,57 @@ class VocalTremorAnalyzer():
         """WAV 파일을 로드하고 전처리"""
         y, sr = librosa.load(wav_file, sr=self.sr)
         return y
-
     def analyze_frequency_variation(self, y, frame_length=2048, hop_length=512):
         """주파수 변동 분석 (초 단위 결과 생성)"""
-        f0, voiced_flag, voiced_probs = librosa.pyin(y,
-                                                     fmin=librosa.note_to_hz('C2'),
-                                                     fmax=librosa.note_to_hz('C7'),
-                                                     frame_length=frame_length,
-                                                     hop_length=hop_length)
-        # nan 제거 및 초당 결과 생성
-        f0 = f0[~np.isnan(f0)]
+        f0, voiced_flag, voiced_probs = librosa.pyin(
+            y,
+            fmin=librosa.note_to_hz('C2'),
+            fmax=librosa.note_to_hz('C7'),
+            frame_length=frame_length,
+            hop_length=hop_length
+        )
+
+        f0 = np.nan_to_num(f0, nan=0.0)
         results_per_sec = []
-        
+
         for start in range(0, len(f0), int(self.sr / hop_length)):
             sec_f0 = f0[start:start + int(self.sr / hop_length)]
             if len(sec_f0) > 0:
+                # nan 값을 포함하여 통계 계산
+                freq_std = np.nanstd(sec_f0)  # nan-safe 표준 편차
+                freq_variation = np.nanmean(np.abs(np.diff(sec_f0))) if len(sec_f0) > 1 else 0
+                tremor_intensity = (np.nanmean(np.abs(np.diff(sec_f0))) / np.nanmean(sec_f0)
+                                    if np.nanmean(sec_f0) > 0 else 0)
+
                 results_per_sec.append({
-                    'freq_std': np.std(sec_f0),
-                    'freq_variation': np.abs(np.diff(sec_f0)).mean() if len(sec_f0) > 1 else 0,
-                    'tremor_intensity': np.abs(np.diff(sec_f0)).mean() / np.mean(sec_f0) if np.mean(sec_f0) > 0 else 0
+                    'freq_std': freq_std,
+                    'freq_variation': freq_variation,
+                    'tremor_intensity': tremor_intensity
                 })
 
         return results_per_sec
+
+    # def analyze_frequency_variation(self, y, frame_length=2048, hop_length=512):
+    #     """주파수 변동 분석 (초 단위 결과 생성)"""
+    #     f0, voiced_flag, voiced_probs = librosa.pyin(y,
+    #                                                  fmin=librosa.note_to_hz('C2'),
+    #                                                  fmax=librosa.note_to_hz('C7'),
+    #                                                  frame_length=frame_length,
+    #                                                  hop_length=hop_length)
+    #     # nan 제거 및 초당 결과 생성
+    #     f0 = f0[~np.isnan(f0)]
+    #     results_per_sec = []
+        
+    #     for start in range(0, len(f0), int(self.sr / hop_length)):
+    #         sec_f0 = f0[start:start + int(self.sr / hop_length)]
+    #         if len(sec_f0) > 0:
+    #             results_per_sec.append({
+    #                 'freq_std': np.std(sec_f0),
+    #                 'freq_variation': np.abs(np.diff(sec_f0)).mean() if len(sec_f0) > 1 else 0,
+    #                 'tremor_intensity': np.abs(np.diff(sec_f0)).mean() / np.mean(sec_f0) if np.mean(sec_f0) > 0 else 0
+    #             })
+
+    #     return results_per_sec
 
     def analyze_amplitude_modulation(self, y, frame_length=2048, hop_length=512):
         """진폭 변조 분석 (초 단위 결과 생성)"""
@@ -139,15 +168,17 @@ def plot_tension_distribution_line(metrics, metric_names, output_folder, video, 
         if name == "Entropy Std":
             top_indices = [idx for idx, _ in sorted(enumerate(scaled_metric), key=lambda x: x[1], reverse=True)[:2]]
 
-        
-        plt.figure(figsize=(15, 6))
+        if name == 'Entropy Std':
+            plt.figure(figsize=(15, 6))
+        if name == "Frequency Variation":
+            plt.figure(figsize=(10, 6))
         plt.plot(scaled_metric, label=name, color=colors, marker='o', linestyle='-')
-  
+        
         # 특정 지표(`entropy_std`)에만 일반적인 감정 상태 범위를 시각화
         if name == "Entropy Std":
-            plt.axhspan(0.0, 0.1, color="blue", alpha=0.1, label="Depressed/Fatigue (0.1 or below)")
-            plt.axhspan(0.1, 0.2, color="green", alpha=0.1, label="Calm/Neutral (0.2 or below)")
-            plt.axhspan(0.5, 1.0, color="red", alpha=0.1, label="Strong Emotion (0.5 or above)")
+            plt.axhspan(0.2, 0.5, color="green", alpha=0.1, label="Calm/Neutral (0.2 ~ 0.5)")
+            # plt.axhspan(0.1, 0.2, color="green", alpha=0.1, label="Calm/Neutral (0.2 or below)")
+            # plt.axhspan(0.5, 1.0, color="red", alpha=0.1, label="Strong Emotion (0.5 or above)")
 
         if name == "Frequency Variation":
             plt.axhspan(2, 5, color="green", alpha=0.1, label="Calm/Neutral (2 ~ 5)")

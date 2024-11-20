@@ -89,7 +89,7 @@ def face_recognition(video, question_id, standard_emotion):
         # 그래프 생성
         plt.figure(figsize=(10, 6))
         plt.plot(emo_label_list, label='Emotion Scores', color="#9137fc", marker='o')  # 감정 점수 선 그래프
-        plt.axhline(y=standard_emotion, color='red', linestyle='--')  # 기준선
+        plt.axhline(y=standard_emotion, color='red', linestyle='--', linewidth=1.5)  # 기준선
 
         # plt.title('Emotion Recognition Analysis')
         # plt.xlabel('Frame Index')
