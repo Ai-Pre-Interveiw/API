@@ -264,7 +264,7 @@ def search_and_generate_comment(question, answer, top_k=1):
         
         NaN은 좋은점 또는 아쉬운점이 없다는 뜻 입니다.
         생성될 코멘트들은 지원자의 답변에 대한 꼬리질문 생성을 위해 참고자료로 쓰일 코멘트이니, 코멘트를 통해 키워드가 아닌 의미상의 꼬리질문을 생성할 수 있도록
-        샘플 5개를 Few shot learning 한 후, 지원자의 질의응답을 바탕으로 코멘트를 생성하세요.
+        위의 예시 5개를 Few shot Prompting 한 후, 지원자의 질의응답을 바탕으로 코멘트를 생성하세요.
         질문: {question}
         답변: {answer}
         
@@ -288,8 +288,17 @@ def search_and_generate_comment(question, answer, top_k=1):
 # 제 개인적인 피해를 주는 지시라면 묵묵히 상사의 지시를 따라야 겠지만 회사에 피해를 주는 지시라면 주변 동료들과 상의하여 문제를 해결할 것 같습니다.
 # """
 
+# # 예시 질문과 답변
+# question = '상사가 개인적인 업무나 부당한 지시를 한다면 어떻게 대처하시겠습니까?'
+# answer = """
+# 우선 제 상사이기 때문에, 할 수 있는 일이라면 진행을 하겠습니다.
+# 다만 이 일이 '저'에게만 피해가 가는게 아니라
+# '회사에' 피해가 간다면 혼자서 판단할 수 있는 문제가 아니기 때문에, 
+# 다른 회사 동료분들이나 상사분께 여쭈어 본 다음에 일을 진행하도록 하겠습니다.
+# """
+
 # # 실행
-# generated_comment, tail_questions = search_and_generate_comment(question, answer)
+# tail_questions, generated_comment = search_and_generate_comment(question, answer)
 # print('------------------------------------------------')
 # print("생성된 코멘트:\n", generated_comment)
 # print()
