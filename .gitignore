@@ -20,9 +20,9 @@ db.sqlite3
 *.pyc
 *.pdf
 *.mp4
-*.png
 *.wav
 
+media*
 # User-specific stuff
 .idea/**
 .idea/**/workspace.xml
