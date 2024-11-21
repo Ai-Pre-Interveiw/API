@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import FullButton from '@common/Fullbutton/index'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/stores/user'
-import { getInterviewResult } from '@/apis/interview'
+import { getInterviewResult, getInterviewDetails } from '@/apis/interview'
 
 
 interface InterviewResult {
@@ -19,12 +19,23 @@ interface InterviewResult {
   voice_distribution_path: string,
   expression_distribution_path: string,
   answer_text: string[],
-  filler_word_positions: string[],
+  filler_word_positions: string,
   follow_up_questions: string[],
   created_at: string,
   updated_at: string,
   interview: number,
   question_detail: {content: string};
+  voice_top_indices: number[],
+}
+
+interface Interview {
+  id: number;
+  scheduled_start: string;
+  position: string;
+  experience_level: string;
+  resume: number;
+  isProcessing?: boolean; // 분석 중 여부 속성 추가
+  isProcessed?: boolean; // 분석 완료 여부 속성 추가
 }
 
 interface AnalysisDetailSectionProps {
@@ -36,7 +47,7 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
   const user = useRecoilValue(userState);
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // 기본값을 0으로 설정하여 종합분석 선택
   const [interviewResults, setInterviewResults] = useState<InterviewResult[]>([]);
-
+  const [interview, setInterviewData] = useState<Interview>();
   const handleItemClick = (index: number) => {
     setSelectedIndex(index); // 선택된 항목의 인덱스를 업데이트
   };
@@ -45,7 +56,9 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
     const loadInterviews = async () => {
       try {
         const interviewResultData = await getInterviewResult(parseInt(id!, 10));
+        const interviewData = await getInterviewDetails(parseInt(id!, 10))
         setInterviewResults(interviewResultData);
+        setInterviewData(interviewData)
       } catch (error) {
         console.error("면접을 불러오는 중 오류가 발생했습니다:", error);
       }
@@ -54,7 +67,7 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
   }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
   return (
     <>
       {interviewResults.length > 0 ? (
@@ -70,8 +83,7 @@ const AnalysisDetailSection: React.FC<AnalysisDetailSectionProps> = ({ id }) => 
               minute: "2-digit",
               hour12: true,
               timeZone: "Asia/Seoul", // 한국 시간대 설정
-            }).format(new Date(interviewResults[0].updated_at))}{" "}
-            진행한 모의면접 분석결과 입니다.
+            }).format(new Date(interview!.scheduled_start))} 진행한 모의면접 분석결과 입니다.
           </a.ThirdTitle>
 
           <a.AllWrap>

@@ -60,7 +60,7 @@ const Index = (props: AuthBackgroundType) => {
               email: userInfo['email'],
               nickname: userInfo['nickname'],
               createdAt: userInfo['createdAt'],
-              imageUrl: 'public/images/profile.png',
+              imageUrl: 'images/profile.png',
               resume: resume.data,
               result: [],
             };
@@ -91,7 +91,7 @@ const Index = (props: AuthBackgroundType) => {
             email: userInfo['email'],
             nickname: userInfo['nickname'],
             createdAt: userInfo['createdAt'],
-            imageUrl: 'public/images/profile.png',
+            imageUrl: 'images/profile.png',
             resume: resume.data, // 조회코드추가
             result: [], // 조회코드추가
           };

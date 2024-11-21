@@ -74,7 +74,7 @@ const Index = () => {
                     hour12: true, // 12시간제 형식 사용
                   }).format(new Date(resume.uploadTime))}
                 <FullButton 
-                  text="자세히 보기" 
+                  text="상세보기" 
                   onClick={() => window.open(`${BASE_URL}/media/${resume.filePath}`, '_blank')} 
                   disabled
                 />

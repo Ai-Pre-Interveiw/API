@@ -108,6 +108,7 @@ export const script = styled.div`
   border-radius: 30px;
   padding: 2vh;
   margin-bottom: 1.2vh;
+  font-size: 2vh;
 `
 
 export const ToggleButton = styled.div`
@@ -136,12 +137,15 @@ export const Content = styled.div<{ isOpen: boolean }>`
   margin-bottom: 2vh;
 `;
 
-export const ContentText = styled.p`
+export const ContentText = styled.div`
   margin: 0;
   padding: 0 10px;
   color: #333;
   line-height: 1.6;
+  font-weight: bold;
+  font-size: 1.5vh;
 `;
+
 
 export const grapBigWrap = styled.div`
   display: flex;

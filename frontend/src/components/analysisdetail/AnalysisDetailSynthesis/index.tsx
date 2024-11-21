@@ -17,7 +17,7 @@ export interface InterviewResult {
   voice_distribution_path: string;
   expression_distribution_path: string;
   answer_text: (string | number)[]; // 문자열 또는 숫자 배열
-  filler_word_positions: (string | number)[]; // 문자열 또는 숫자 배열
+  filler_word_positions: string; // 문자열 또는 숫자 배열
   follow_up_questions: (string | number)[]; // 문자열 또는 숫자 배열
   created_at: string;
   updated_at: string;
@@ -94,15 +94,15 @@ const AnalysisDetailSynthesis: React.FC<AnalysisDetailSynthesisProps> = ({ selec
       <a.contentWrap1>
         <a.contentWrap2>
           <a.contentWrap>
-            {first_gaze !== 0 ?
-              <a.contentTitle onClick={() => handleQuestionClick(first_gaze as number)}>
+            {first_gaze !== '0' ?
+              <a.contentTitle onClick={() => handleQuestionClick(parseInt(first_gaze!, 10))}>
                 {first_gaze}번 질문
               </a.contentTitle>
               :
               <div></div>
             }
-            {second_gaze !== 0 ?
-              <a.contentTitle onClick={() => handleQuestionClick(second_gaze as number)}>
+            {second_gaze !== '0' ?
+              <a.contentTitle onClick={() => handleQuestionClick(parseInt(second_gaze!, 10))}>
                 {second_gaze}번 질문
               </a.contentTitle>
               :
