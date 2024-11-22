@@ -229,9 +229,9 @@ def plot_tension_distribution_line(metrics, metric_names, output_folder, video, 
 
             # 기본 jitter 값으로 그래프 생성
             plt.figure(figsize=(15, 6))
-            plt.plot(metric, label=f"{name} (Original)", color="orange", marker='o', linestyle='-')
+            plt.plot(metric, label=f"{name} (Original)", color=colors, marker='o', linestyle='-')
             # ±25% 영역을 흐리게 표시
-            plt.axhspan(lower_bound, upper_bound, color='green', alpha=0.1, label='±25% Range')
+            plt.axhspan(lower_bound, upper_bound, color='green', alpha=0.15, label='±25% Range')
             plt.grid(True, linestyle="--", alpha=0.5)
             # plt.legend(loc="upper left")
             output_path_ent = f'media/graph/anxiety'
@@ -246,7 +246,7 @@ def plot_tension_distribution_line(metrics, metric_names, output_folder, video, 
             plt.figure(figsize=(15, 6))
             plt.plot(scaled_metric, label=f"{name} (Scaled)", color=colors, marker='o', linestyle='-')
             # ±25% 영역을 흐리게 표시
-            plt.axhspan(lower_bound, upper_bound, color='green', alpha=0.1, label='±25% Range')
+            plt.axhspan(lower_bound, upper_bound, color='green', alpha=0.15, label='±25% Range')
             plt.grid(True, linestyle="--", alpha=0.5)
             # plt.legend(loc="upper left")
             output_path_fre = f"media/graph/voice"
