@@ -118,7 +118,7 @@
 
 # 시스템 아키텍처
 
-![아키텍처](images/Web_App_Reference_Architecture.png)
+![아키텍처](images/아키텍처.png)
 
 # 주요 기술
 
