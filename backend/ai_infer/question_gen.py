@@ -94,7 +94,7 @@ def get_question(entry_or_experienced, job, resume):
     # 질문 생성 체인에서는 temperature를 높임
     random_model = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 
-    # 두 번째 체인: 강점 및 약점 분석
+    # 첫 번째 체인: 강점 및 약점 분석
     strengths_weaknesses_prompt = PromptTemplate(
         input_variables=["doc_text", "applicant_info"],
         template=""" 
@@ -112,7 +112,7 @@ def get_question(entry_or_experienced, job, resume):
         """
     )
 
-    # 네 번째 체인: 학문적 경험과 실무 경험 추출
+    # 두 번째 체인: 학문적 경험과 실무 경험 추출
     academic_experience_prompt = PromptTemplate(
         input_variables=["doc_text", "applicant_info"],
         template=""" 
@@ -195,13 +195,13 @@ def get_question(entry_or_experienced, job, resume):
     guideline_text = truncate_text(search_across_all_stores("핵심 평가 요소 질문 생성 지침"))
     guideline_text += "\n\n" + truncate_text(search_across_all_stores("질문 생성 전 검토 과정"))
 
-    # 두 번째 체인 (강점 및 약점 분석)
+    # 첫 번째 체인 (강점 및 약점 분석)
     strengths_weaknesses_chain = strengths_weaknesses_prompt | fixed_model
 
-    # 네 번째 체인 (학문적 경험과 실무 경험 추출)
+    # 두 번째 체인 (학문적 경험과 실무 경험 추출)
     academic_experience_chain = academic_experience_prompt | fixed_model
 
-    # 다섯 번째 체인(질문 생성)
+    # 세 번째 체인(질문 생성)
     question_chain = question_prompt | random_model
 
     # 모든 페이지의 텍스트를 하나의 문자열로 결합
@@ -257,7 +257,7 @@ def get_question(entry_or_experienced, job, resume):
     print(result)
     return result
 
-# get_question('entry', 'AI')
+get_question('entry', 'AI', '자기소개서_김민욱.pdf')
 
 # #질문 세트 8개
 # # 각 자기소개서 페이지 텍스트에 대해 정보 추출, 강점/약점 분석, 경험 추출 후 질문 생성
