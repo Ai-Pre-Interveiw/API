@@ -19,7 +19,6 @@ db.sqlite3
 
 *.pyc
 *.pdf
-*.mp4
 *.wav
 
 media*

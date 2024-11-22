@@ -10,6 +10,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
+import parselmouth
+from parselmouth.praat import call
 
 # 비디오 파일에서 wav 파일 추출
 def extract_audio_from_video(video_file, output_folder):
@@ -28,7 +30,7 @@ def extract_audio_from_video(video_file, output_folder):
     video.audio.write_audiofile(wav_path, codec='pcm_s16le')
     print(f"Extracted audio to {wav_path}")
 
-class VocalTremorAnalyzer():
+# class VocalTremorAnalyzer():
     def __init__(self, sample_rate=22050):
         self.sr = sample_rate
 
@@ -36,6 +38,7 @@ class VocalTremorAnalyzer():
         """WAV 파일을 로드하고 전처리"""
         y, sr = librosa.load(wav_file, sr=self.sr)
         return y
+
     def analyze_frequency_variation(self, y, frame_length=2048, hop_length=512):
         """주파수 변동 분석 (초 단위 결과 생성)"""
         f0, voiced_flag, voiced_probs = librosa.pyin(
@@ -57,7 +60,7 @@ class VocalTremorAnalyzer():
                 freq_variation = np.nanmean(np.abs(np.diff(sec_f0))) if len(sec_f0) > 1 else 0
                 tremor_intensity = (np.nanmean(np.abs(np.diff(sec_f0))) / np.nanmean(sec_f0)
                                     if np.nanmean(sec_f0) > 0 else 0)
-
+                
                 results_per_sec.append({
                     'freq_std': freq_std,
                     'freq_variation': freq_variation,
@@ -65,28 +68,6 @@ class VocalTremorAnalyzer():
                 })
 
         return results_per_sec
-
-    # def analyze_frequency_variation(self, y, frame_length=2048, hop_length=512):
-    #     """주파수 변동 분석 (초 단위 결과 생성)"""
-    #     f0, voiced_flag, voiced_probs = librosa.pyin(y,
-    #                                                  fmin=librosa.note_to_hz('C2'),
-    #                                                  fmax=librosa.note_to_hz('C7'),
-    #                                                  frame_length=frame_length,
-    #                                                  hop_length=hop_length)
-    #     # nan 제거 및 초당 결과 생성
-    #     f0 = f0[~np.isnan(f0)]
-    #     results_per_sec = []
-        
-    #     for start in range(0, len(f0), int(self.sr / hop_length)):
-    #         sec_f0 = f0[start:start + int(self.sr / hop_length)]
-    #         if len(sec_f0) > 0:
-    #             results_per_sec.append({
-    #                 'freq_std': np.std(sec_f0),
-    #                 'freq_variation': np.abs(np.diff(sec_f0)).mean() if len(sec_f0) > 1 else 0,
-    #                 'tremor_intensity': np.abs(np.diff(sec_f0)).mean() / np.mean(sec_f0) if np.mean(sec_f0) > 0 else 0
-    #             })
-
-    #     return results_per_sec
 
     def analyze_amplitude_modulation(self, y, frame_length=2048, hop_length=512):
         """진폭 변조 분석 (초 단위 결과 생성)"""
@@ -151,7 +132,79 @@ class VocalTremorAnalyzer():
         
         return pd.DataFrame(all_results)
     
+def analyze_wav_1s(file_path):
+    try:
+        # Sound 객체 생성
+        sound = parselmouth.Sound(file_path)
+        duration = sound.get_total_duration()  # 음성 파일 길이 (초)
 
+        # 음성 파일 확인 (에너지가 매우 낮은 경우 스킵)
+        if sound.get_energy() < 1e-6:
+            print(f"No valid audio in file: {file_path}")
+            return None
+
+        # 1초 간격으로 데이터 나누기
+        time_intervals = np.arange(0, duration, 1)  # 1초 단위 구간
+
+        # 결과 저장 리스트
+        results = []
+
+        for start_time in time_intervals:
+            end_time = min(start_time + 1, duration)  # 1초 구간 또는 마지막 구간
+
+            # 현재 구간의 소리 추출
+            segment = sound.extract_part(from_time=start_time, to_time=end_time, preserve_times=True)
+
+            # Pitch, Jitter, Shimmer 계산
+            pitch = segment.to_pitch_ac(time_step=0.01, pitch_floor=75, pitch_ceiling=600)
+            frequencies = pitch.selected_array["frequency"]
+            frequencies = frequencies[frequencies > 0]  # 0Hz 제거 (무음 처리)
+
+            # 평균 F0 계산
+            mean_pitch = np.mean(frequencies) if len(frequencies) > 0 else np.nan
+
+            # Jitter 및 Shimmer 계산
+            point_process = call(segment, "To PointProcess (periodic, cc)", 75, 600)
+            try:
+                jitter = call(point_process, "Get jitter (local)", 0, 0, 0.0001, 0.02, 1.3)
+            except Exception:
+                jitter = np.nan
+            try:
+                shimmer = call([segment, point_process], "Get shimmer (local)", 0, 0, 0.0001, 0.02, 1.3, 1.6)
+            except Exception:
+                shimmer = np.nan
+
+            # 성별 구분
+            gender = "female" if mean_pitch >= 165 else "male"
+
+            # 결과 저장
+            results.append({
+                "Start Time (s)": start_time,
+                "End Time (s)": end_time,
+                "F0 (Hz)": mean_pitch,
+                "Jitter": jitter,
+                "Shimmer": shimmer,
+                "Gender": gender
+            })
+
+        # 데이터프레임 생성
+        result_df = pd.DataFrame(results)
+        result_df = result_df.fillna(0)
+        return result_df
+
+    except Exception as e:
+        print(f"Error processing {file_path}: {e}")
+        return None
+    
+def process_single_file(file_path):
+    # 1초 단위 분석
+    result_df = analyze_wav_1s(file_path)
+
+    if result_df is None:
+        print(f"Could not process the file: {file_path}")
+
+    return result_df
+    
 # 선 그래프 그리기
 def plot_tension_distribution_line(metrics, metric_names, output_folder, video, emo_label, colors="#9137fc"):
     video_name = video.split('.')[-2]  # 비디오 이름 추출
@@ -165,53 +218,44 @@ def plot_tension_distribution_line(metrics, metric_names, output_folder, video, 
             for val, label in zip(metric, emo_label)
         ]
 
-        if name == "Entropy Std":
+        if name == "jitter":
+            # Top 2 인덱스 추출
             top_indices = [idx for idx, _ in sorted(enumerate(scaled_metric), key=lambda x: x[1], reverse=True)[:2]]
 
-        if name == 'Entropy Std':
+            # 기준값 및 ±25% 범위 계산
+            reference_value = 0.024370
+            lower_bound = reference_value * (1 - 0.25)  # 기준값의 -25%
+            upper_bound = reference_value * (1 + 0.25)  # 기준값의 +25%
+
+            # 기본 jitter 값으로 그래프 생성
             plt.figure(figsize=(15, 6))
-        if name == "Frequency Variation":
-            plt.figure(figsize=(10, 6))
-        plt.plot(scaled_metric, label=name, color=colors, marker='o', linestyle='-')
-        
-        # 특정 지표(`entropy_std`)에만 일반적인 감정 상태 범위를 시각화
-        if name == "Entropy Std":
-            plt.axhspan(0.2, 0.5, color="green", alpha=0.1, label="Calm/Neutral (0.2 ~ 0.5)")
-            # plt.axhspan(0.1, 0.2, color="green", alpha=0.1, label="Calm/Neutral (0.2 or below)")
-            # plt.axhspan(0.5, 1.0, color="red", alpha=0.1, label="Strong Emotion (0.5 or above)")
-
-        if name == "Frequency Variation":
-            plt.axhspan(2, 5, color="green", alpha=0.1, label="Calm/Neutral (2 ~ 5)")
-            
-        # 축 및 제목 설정
-        plt.grid(True, linestyle="--", alpha=0.5)
-        # plt.legend(loc="upper left")
-
-        # ent_output_path = ''
-        # ent_output_db_path = ''
-        if name == "Entropy Std":
-            print('엔트로피요~~~~~~~~~~~')
-            output_path_ent = f'C:/Users/USER/Desktop/pjt/API/backend/media/graph/anxiety'
+            plt.plot(metric, label=f"{name} (Original)", color="orange", marker='o', linestyle='-')
+            # ±25% 영역을 흐리게 표시
+            plt.axhspan(lower_bound, upper_bound, color='green', alpha=0.1, label='±25% Range')
+            plt.grid(True, linestyle="--", alpha=0.5)
+            # plt.legend(loc="upper left")
+            output_path_ent = f'media/graph/anxiety'
             os.makedirs(output_path_ent, exist_ok=True)
             ent_output_graph_path = f'{output_path_ent}/{name}_{video_name}'
             ent_output_path = ent_output_graph_path
             ent_output_db_path = f'graph/anxiety/{name}_{video_name}.png'
             plt.savefig(ent_output_graph_path, bbox_inches='tight')
             plt.close()
-            # print(f"Graph saved to {output_path}")
-        # fre_output_path = ''
-        # fre_output_db_path = ''
-        if name == "Frequency Variation":
-            print('프리퀀시요~~~~~~~~~~')
-            output_path_fre = f"C:/Users/USER/Desktop/pjt/API/backend/media/graph/voice"
+
+            # scaled jitter 값으로 그래프 생성
+            plt.figure(figsize=(15, 6))
+            plt.plot(scaled_metric, label=f"{name} (Scaled)", color=colors, marker='o', linestyle='-')
+            # ±25% 영역을 흐리게 표시
+            plt.axhspan(lower_bound, upper_bound, color='green', alpha=0.1, label='±25% Range')
+            plt.grid(True, linestyle="--", alpha=0.5)
+            # plt.legend(loc="upper left")
+            output_path_fre = f"media/graph/voice"
             os.makedirs(output_path_fre, exist_ok=True)
             fre_output_graph_path = f'{output_path_fre}/{name}_{video_name}'
             fre_output_path = fre_output_graph_path
             fre_output_db_path = f'graph/voice/{name}_{video_name}.png'
             plt.savefig(fre_output_graph_path, bbox_inches='tight')
             plt.close()
-            # print(f"Graph saved to {output_path}")
-    
-    # print('아웃풋 패쓰 리스트', output_path_list)
-    # print('아웃풋 패쓰 디비리스트', output_path_db_list)
+
     return ent_output_path + '.png', fre_output_path + '.png', ent_output_db_path, fre_output_db_path, top_indices
+

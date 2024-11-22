@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from ai_infer.Pose_Eye_mp_Final import mp_pose_eye_infer
 from ai_infer.emotion_4_class_recognition import face_recognition
-from ai_infer.voice_algolithm import extract_audio_from_video, VocalTremorAnalyzer, plot_tension_distribution_line
+from ai_infer.voice_algolithm import extract_audio_from_video, plot_tension_distribution_line, process_single_file
 from ai_infer.STT_infer import stt_result
 from ai_infer.question_result import search_and_generate_comment
 from ai_infer.sketch_synthesis import sketch_synthesis
@@ -88,20 +88,6 @@ def inference_eye_pose(request, interview_id):
                         exp_synthesis.append(bad_emotion)
                         emotion_labels.append(emo_label)
                     
-                    
-
-                    print(f'여기인가 {eye_graph_path}')
-                    print(f'아님여기 {eye_graph_image_path}')
-                    # # 파일 생성 대기 루프 (최대 10초 대기)
-                    # max_wait_time = 10  # 최대 대기 시간(초)
-                    # wait_interval = 0.5  # 확인 주기(초)
-                    # elapsed_time = 0
-
-                    # while (not os.path.exists(eye_graph_path) or not os.path.exists(pose_graph_path)) and elapsed_time < max_wait_time:
-                    #     time.sleep(wait_interval)
-                    #     elapsed_time += wait_interval
-                    #     print(elapsed_time)
-                    #     # print(f"Waiting for files: {eye_graph_path} and {pose_graph_path}")
 
                     # 파일이 생성된 경우에만 업데이트
                     if os.path.exists(eye_graph_path) and os.path.exists(pose_graph_path) and os.path.exists(exp_graph_output_path) and question_id % 8 != 0:
@@ -135,30 +121,22 @@ def inference_eye_pose(request, interview_id):
                 print('일단 wav는 나오고')
 
     # 음성 감정 분석
-    voice_emotion = VocalTremorAnalyzer()
     for idx, wav_file in enumerate(os.listdir(wav_folder)):
         wav_path = f"{wav_folder}/{wav_file}"
         print(len(emotion_labels), idx)
         print(emotion_labels)
         print(emotion_labels[idx - 1])
         # `analyze_wav_files`의 첫 번째 결과를 가져와 각 메트릭 값을 추출
-        voice_result = voice_emotion.analyze_wav_files([wav_path])
+        voice_result = process_single_file(wav_path)
 
         # voice_result에서 각 메트릭 추출
-        # print(voice_result)
-        # freq_std = voice_result['freq_std']
-        freq_variation = voice_result['freq_variation']
-        # modulation_index = voice_result['modulation_index']
-        entropy_std = voice_result['entropy_std']
-        # entropy_rate = voice_result['entropy_rate']
-        print('프리크배리에이션', freq_variation)
-        print('엔트로피에스티디', entropy_std)
+        jitter = voice_result['Jitter']
 
         # 각 메트릭에 대해 그래프 생성
         # metrics = [freq_std, freq_variation, modulation_index, entropy_std, entropy_rate]
         # metric_names = ["Frequency Std", "Frequency Variation", "Modulation Index", "Entropy Std", "Entropy Rate"]
-        line_metrics = [entropy_std, freq_variation]
-        line_metric_names = ['Entropy Std', 'Frequency Variation']
+        line_metrics = [jitter]
+        line_metric_names = ['jitter']
         # plot_tension_distribution(metrics, metric_names, output_folder=wav_plt_folder, video=wav_file)
         anxiety_graph_output_path, voice_graph_output_path, anxiety_graph_path, voice_graph_path, voice_top_indices = plot_tension_distribution_line(line_metrics, line_metric_names, output_folder=anxiety_folder, video=wav_file, emo_label=emotion_labels[idx - 1])
         print('긴장도그래프 저장 경로', anxiety_graph_output_path)
